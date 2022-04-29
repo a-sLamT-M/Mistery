@@ -1,0 +1,77 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "注册";
+}
+<head>
+    <link rel="stylesheet" type="text/css" href="AccountStyle.css"/>
+</head>
+<script>
+    function onSubmit(token) {
+        document.getElementById("registerForm").submit();
+    }
+</script>
+<div class="row shadow p-3 rounded-start" id="login-form" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="col-md-5 ">
+        <div class="mt-4 mb-4 justify-content-center">
+            <h1 class="display-6 text-capitalize ">注册</h1>
+        </div>
+        <hr/>
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <div class="login-form ">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="mb-3">
+                    <label asp-for="Input.Email"></label>
+                    <input asp-for="Input.Email" type="email" class="form-control" autocomplete="username" aria-required="true"/>
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Input.Password"></label>
+                    <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true"/>
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Input.ConfirmPassword"></label>
+                    <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true"/>
+                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                </div>
+                <button id="registerSubmit"
+                        data-sitekey="6LcqCK4fAAAAAEsTuFUl-iX2BftJhxWMrou6_Izi" 
+                        data-callback='onSubmit' 
+                        data-action='submit' class="mb-4 mt-2 w-100 btn btn-lg btn-primary g-recaptcha">Register</button>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-6 col-md-offset-2 ms-4">
+        <section>
+            <h4 class="mt-5 mb-3">使用其他方式注册</h4>
+            @{
+                if ((Model.ExternalLogins?.Count ?? 0) == 0)
+                {
+                    <div>
+                        <p>
+                            禁止使用其他方式注册
+                        </p>
+                    </div>
+                }
+                else
+                {
+                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                        <div>
+                            <p>
+                                @foreach (var provider in Model.ExternalLogins)
+                                {
+                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                                }
+                            </p>
+                        </div>
+                    </form>
+                }
+            }
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

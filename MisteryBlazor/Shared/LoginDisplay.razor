@@ -1,0 +1,13 @@
+﻿@using MisteryBlazor.StringUtils
+<AuthorizeView>
+    <Authorized>
+        <a href="Identity/Account/Manage">当前用户： @context.User.Identity?.Name.ToStringFromASCIIByte()</a>
+        <form method="post" action="Identity/Account/LogOut">
+            <button type="submit" class="nav-link btn btn-link">登出</button>
+        </form>
+    </Authorized>
+    <NotAuthorized>
+        <a href="Identity/Account/Register">注册</a>
+        <a href="Identity/Account/Login">登录</a>
+    </NotAuthorized>
+</AuthorizeView>
