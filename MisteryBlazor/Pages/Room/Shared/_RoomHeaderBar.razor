@@ -1,0 +1,43 @@
+﻿@code {
+    public static string SearchText
+    {
+        get;
+        set;
+    }
+}
+
+<div class="room-header">
+    <div class="room-header-left">
+        <span class="room-header-left-icon">
+            <MudIcon Size="Size.Medium" Icon="@Icons.Filled.Circle"/>
+        </span>
+        <div class="room-header-left-text fs-5 fw-bold">
+            TEST
+        </div>
+    </div>
+    <div class="room-header-right">
+        <div class="room-header-right-icon">
+            <span class="room-header-right-ico-notification">
+                <MudIcon Size="Size.Medium" Icon="@Icons.Filled.Notifications"/>
+            </span>
+            <span class="room-header-right-ico-locationedit">
+                <MudIcon Size="Size.Medium" Icon="@Icons.Filled.EditLocationAlt"/>
+            </span>
+            <span class="room-header-right-ico-peoplealt">
+                <MudIcon Size="Size.Medium" Icon="@Icons.Filled.PeopleAlt"/>
+            </span>
+            <span class="room-header-right-options">
+                <MudIcon Icon="@Icons.Filled.Settings" Size="Size.Medium"/>
+            </span>
+        </div>
+        <div class="room-header-search">
+            <input placeholder="搜索聊天记录" class="room-header-right-search-input"/>
+            <div class="room-header-right-search-ico">
+                <MudIcon Icon="@Icons.Filled.Search"></MudIcon>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>

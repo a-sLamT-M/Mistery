@@ -1,4 +1,6 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@imoprt url('_content/MudBlazor/MudBlazor.min.js');
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;

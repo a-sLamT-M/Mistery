@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using MisteryBlazor.Areas.Identity;
 using MisteryBlazor.Data;
 using NuGet.Protocol.Plugins;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");;
@@ -29,7 +30,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 {
     
 });
-
+builder.Services.AddMudServices();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -1,0 +1,31 @@
+﻿@code {
+
+}
+
+<div class="room-chat">
+    <_RoomChatHeader/>
+    <div class="room-chat-messages">
+        <_RoomChatMessage/>
+    </div>
+    
+    <div class="room-chat-input-form">
+        <span class="room-chat-input-icon-plus">
+            <MudIcon Icon="@Icons.Filled.AddCircle" Size="Size.Medium"/>
+        </span>
+        <form class="room-chat-input-form-input">
+            <input placeholder="Message"/>
+            <button class="room-chat-input-form-SubmitButton"type="submit">Send Message</button>
+        </form>
+        <div class="room-chat-input-icons">
+            <span class="room-chat-input-form-icons-cardgiftcard">
+                <MudIcon Icon="@Icons.Filled.CardGiftcard" Size="Size.Medium"/>
+            </span>
+            <span class="room-chat-input-form-icons-emoji">
+                <MudIcon Icon="@Icons.Filled.EmojiEmotions" Size="Size.Medium"/>
+            </span>
+            <span class="room-chat-input-form-icons-gif">
+                <MudIcon Icon="@Icons.Filled.Gif" Size="Size.Medium"/>
+            </span>
+        </div>
+    </div>
+</div>

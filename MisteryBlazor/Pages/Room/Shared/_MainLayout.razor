@@ -1,0 +1,26 @@
+﻿@inherits LayoutComponentBase
+<head>
+    <link href="BlazorMaterialUI.styles.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+</head>
+
+<MudThemeProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+<PageTitle>MisteryBlazor</PageTitle>
+<div class="room-page-MainLayout">
+    <div class="room-mainlayout-sidebar">
+        <_RoomUserBar/>
+        <_RoomSideBar/>
+    </div>
+
+    <main class="room-page-MainLayout-HeaderBar">
+        <_RoomHeaderBar/>
+        <_RoomChat/>
+    </main>
+</div>
+@code {
+
+}

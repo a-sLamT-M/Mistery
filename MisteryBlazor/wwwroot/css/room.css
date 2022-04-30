@@ -1,0 +1,320 @@
+﻿@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+@imoprt url('_content/MudBlazor/MudBlazor.min.js');
+
+.room {
+    display: flex;
+}
+
+.room-page-MainLayout {
+    display: flex;
+}
+
+.room-sidebar {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 100vh;
+    background-color: #262829;
+}
+
+.room-sidebar-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-left: 6px;
+    background-color: #262829;
+    color: white;
+    border-bottom: 3px solid #1F2022;
+}
+
+.room-sidebar-channels {
+    flex: 1;
+}
+
+.room-sidebar-channel-text-name {
+    margin-top: 2px;
+}
+
+.room-sidebar-channels-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    padding-left: 10px;
+    padding-bottom: 5px;
+    color: gray;
+}
+
+.room-sidebar-top-text {
+    padding-top: 4px;
+    padding-left: 5px;
+}
+
+.room-sidebar-header {
+    display: flex;
+    align-items: center;
+}
+
+.room-sidebar-channels-text-channels {
+    margin-left: 5px;
+}
+
+.room-sidebar-addchannel {
+    margin-right: 21px;
+    cursor: pointer;
+}
+
+    .room-sidebar-addchannel:hover {
+        color: #B3B3B3;
+    }
+
+.room-sidebar-channel:hover {
+    color: #CCCCCC;
+    background-color: #292A2B;
+}
+
+.room-sidebar-channel {
+    display: flex;
+    padding-left: 18px;
+    margin: 5px;
+    padding-left: -5px;
+    align-items: center;
+    background: transparent;
+    color: gray;
+    cursor: pointer;
+}
+
+.room-sidebar-channel-icon, .room-header-left-icon {
+    color: white;
+    align-items: center;
+    margin: 10px;
+}
+
+.room-sidebar-voice, .room-sidebar-profile {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1F2021;
+    color: gray;
+    padding: 2px;
+    border-top: 2px solid #282828;
+}
+
+.room-sidebar-voice-VoiceInfo {
+    flex: 1;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+
+.room-sidebar-voice-voiceico {
+    margin-left: 4px;
+    color: #22A848;
+}
+
+.room-sidebar-voice-VoiceInfo-text-VoiceConnected {
+    color: #22A848;
+}
+
+.room-sidebar-voice-voiceInfoIco, .room-sidebar-voice-icons, .room-sidebar-profile-icons {
+    display: flex;
+    align-items: center;
+}
+
+.room-sidebar-voice-icons, room-sidebar-profile-icons {
+    margin-right: 10px;
+}
+
+.room-sidebar-voice-icons-OutlinedInfo {
+    padding: 10px;
+}
+
+.room-sidebar-profile-info-name {
+    color: white;
+}
+
+.room-sidebar-profile-icons-mic, .room-sidebar-profile-icons-headset, .room-sidebar-profile-icons-setting {
+    padding: 5px;
+}
+
+.room-sidebar-profile-info {
+    flex: 1;
+    padding: 10px;
+    margin-top: 5px;
+    margin-left: 5px;
+}
+
+.room-sidebar-profile-avatar {
+    margin-left: 5px;
+    margin-top: 8px;
+}
+
+.room-sidebar-profile-info-id {
+    margin-top: -0.1%;
+}
+
+.room-header {
+    background-color: #272829;
+    display: flex;
+    padding: 5px;
+    justify-content: space-between;
+    align-items: center;
+    color: gray;
+    border: #222222;
+}
+
+.room-header-left {
+    display: flex;
+    align-items: center;
+}
+
+.room-header-left-text {
+    padding-top: 2px;
+    color: #CCCCCC;
+}
+
+.room-header-left-icon {
+    color: #CCCCCC;
+}
+
+.room-header-right {
+    display: flex;
+    justify-content: space-between;
+    margin-right: 15px;
+    align-items: center;
+}
+.room-header-search {
+    color: gray;
+    background-color: #222222;
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    padding-left: 10px;
+    margin-top: 1px; 
+}
+.room-header-right-icon {
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.room-header-right-ico-notification, .room-header-right-ico-locationedit, .room-header-right-options, .room-header-right-ico-peoplealt {
+    padding: 5px;
+    cursor: pointer;
+}
+.room-sidebar-profile-icons-setting:hover, .room-header-right-options:hover, .room-header-right-ico-notification:hover, .room-header-right-ico-locationedit:hover, .room-header-right-ico-peoplealt:hover {
+    color: #CCCCCC;
+}
+
+.room-page-MainLayout-HeaderBar {
+    display: flex;
+    flex-direction: column;
+    flex: 4.5;
+}
+
+.room-header-right-search-input {
+    background: transparent;
+    display: flex;
+    align-items: center;
+    color: #CCCCCC;
+    outline-width: 0px;
+    border: none;
+}
+
+.room-header-right-search-ico {
+    padding: 5px;
+}
+
+.room-chat {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    background-color: #2D2F33;
+    height: 100vh;
+}
+
+.room-chat-input-icons {
+    display: flex;
+    align-items: center;
+}
+
+.room-chat-input-form {
+    color: #CCCCCC;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px;
+    border-radius: 10px;
+    margin: 20px;
+    border-top: 1px solid #484A4D;
+    background-color: #37393B;
+}
+
+.room-chat-input-icon-plus, .room-chat-input-form-icons-cardgiftcard, .room-chat-input-form-icons-emoji, .room-chat-input-form-icons-gif, .room-chat-input-form-SubmitButton {
+    padding: 5px;
+}
+
+.room-chat-messages {
+    margin: 10px;
+    flex: 1;
+}
+
+.room-chat-input-form-input > input {
+    padding: 5px;
+    margin-left: 5px;
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline-width: 0;
+    color: #CCCCCC;
+    font-size: large;
+}
+
+.room-chat-input-form > form {
+    flex: 1;
+}
+
+.room-chat-input-form-SubmitButton {
+    display: none;
+}
+
+.room-chat-message {
+    display: flex;
+    align-content: center;
+    padding: 20px;
+    color: #CCCCCC
+}
+
+.room-message {
+    margin-left: 20px;
+}
+
+.message-timestamp {
+    color: gray;
+    margin-left: 5px;
+    font-size: x-small;
+}
+
+.single-message {
+    margin-top: 3px;
+}
+
+.room-mainlayout-sidebar {
+    display: flex;
+    flex: 1;
+}
+
+.room-userbar {
+    padding: 15px;
+    background-color: #1D1E1F;
+}
+
+.room-userbar-groups-func {
+    padding-top: 20px;
+}
+
+.room-userbargroup {
+    padding-bottom: 8px;
+}
