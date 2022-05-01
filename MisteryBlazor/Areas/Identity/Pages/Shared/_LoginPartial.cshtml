@@ -1,7 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using MisteryBlazor.Data.User
 @using MisteryBlazor.StringUtils
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+@inject SignInManager<MisteryIdentityUser> SignInManager
+@inject UserManager<MisteryIdentityUser> UserManager
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 <ul class="navbar-nav">

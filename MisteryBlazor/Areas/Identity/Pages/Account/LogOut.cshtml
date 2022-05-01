@@ -1,7 +1,8 @@
 ﻿@page
 @using Microsoft.AspNetCore.Identity
+@using MisteryBlazor.Data.User
 @attribute [IgnoreAntiforgeryToken]
-@inject SignInManager<IdentityUser> SignInManager
+@inject SignInManager<MisteryIdentityUser> SignInManager
 @functions {
     public async Task<IActionResult> OnPost()
     {

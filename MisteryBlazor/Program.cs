@@ -1,23 +1,22 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using MisteryBlazor.Areas.Identity;
 using MisteryBlazor.Data;
-using NuGet.Protocol.Plugins;
+using MisteryBlazor.Data.Context;
+using MisteryBlazor.Data.User;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");;
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection"); ;
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));;
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(connectionString));
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();;
+builder.Services.AddDefaultIdentity<MisteryIdentityUser>((IdentityOptions options) => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<MisteryBlazor.Data.Context.AppDbContext>();
+
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
@@ -28,7 +27,7 @@ builder.Services.AddAuthorization(options =>
 });
 builder.Services.Configure<IdentityOptions>(options =>
 {
-    
+
 });
 builder.Services.AddMudServices();
 var app = builder.Build();
@@ -59,7 +58,8 @@ app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
 app.UseStatusCodePages(
-    async options => {
+    async options =>
+    {
         if (options.HttpContext.Response.StatusCode == 404)
         {
             options.HttpContext.Response.Redirect("/Pages/_LongShared");

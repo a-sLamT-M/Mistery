@@ -35,15 +35,16 @@
 
 .room-sidebar-channel-text-name {
     margin-top: 2px;
+    font-size: large;
 }
 
 .room-sidebar-channels-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 12px;
-    padding-left: 10px;
-    padding-bottom: 5px;
+    padding-top: 10px;
+    padding-left: 5px;
+    margin-bottom: -1px;
     color: gray;
 }
 
@@ -57,12 +58,16 @@
     align-items: center;
 }
 
+.room-sidebar-expandchannel {
+    padding-bottom: 2px; 
+}
+
 .room-sidebar-channels-text-channels {
     margin-left: 5px;
 }
 
 .room-sidebar-addchannel {
-    margin-right: 21px;
+    margin-right: 12px;
     cursor: pointer;
 }
 
@@ -72,21 +77,25 @@
 
 .room-sidebar-channel:hover {
     color: #CCCCCC;
-    background-color: #292A2B;
+    background-color: #393A3C;
 }
 
 .room-sidebar-channel {
     display: flex;
-    padding-left: 18px;
-    margin: 5px;
-    padding-left: -5px;
+    margin: 4px;
+    padding-left: 19px;
     align-items: center;
     background: transparent;
     color: gray;
     cursor: pointer;
 }
 
-.room-sidebar-channel-icon, .room-header-left-icon {
+.room-sidebar-channel-icon {
+    color: white;
+    align-items: center;
+    margin: 5px;
+}
+.room-header-left-icon {
     color: white;
     align-items: center;
     margin: 10px;
@@ -98,7 +107,6 @@
     align-items: center;
     background-color: #1F2021;
     color: gray;
-    padding: 2px;
     border-top: 2px solid #282828;
 }
 
@@ -115,7 +123,13 @@
 }
 
 .room-sidebar-voice-VoiceInfo-text-VoiceConnected {
+    padding-top: 3px;
+    font-size: x-small;
     color: #22A848;
+}
+
+.room-sidebar-voice-VoiceInfo-text-stream {
+    font-size: x-small;
 }
 
 .room-sidebar-voice-voiceInfoIco, .room-sidebar-voice-icons, .room-sidebar-profile-icons {
@@ -133,6 +147,7 @@
 
 .room-sidebar-profile-info-name {
     color: white;
+
 }
 
 .room-sidebar-profile-icons-mic, .room-sidebar-profile-icons-headset, .room-sidebar-profile-icons-setting {
@@ -153,6 +168,8 @@
 
 .room-sidebar-profile-info-id {
     margin-top: -0.1%;
+    margin-left: -2px;
+    font-size: x-small;
 }
 
 .room-header {
@@ -211,7 +228,7 @@
 .room-page-MainLayout-HeaderBar {
     display: flex;
     flex-direction: column;
-    flex: 4.5;
+    flex: 3.4;
 }
 
 .room-header-right-search-input {
@@ -311,10 +328,79 @@
     background-color: #1D1E1F;
 }
 
+.room-userbar-avatar {
+    padding-bottom: 10px;
+}
+
+.room-userbar-add {
+    color: #22C922;
+    width: 55px;
+    height: 55px;
+    border-radius: 100px;
+    background-color: #37393B;
+}
+
+.room-userbar-add-ico-plus {
+    margin-left: 10px;
+    margin-top: 9px;
+
+}
+
 .room-userbar-groups-func {
-    padding-top: 20px;
+    padding-top: 10px;
 }
 
 .room-userbargroup {
-    padding-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 10px;
+}
+
+.room-userbargroup-avatar {
+    filter: brightness(0.5);
+}
+
+.room-userbargroup-avatar:hover {
+    animation-name: bright-ani;
+    animation-duration: 0.2s;
+    animation-timing-function: ease-out;
+    filter: brightness(1);
+}
+
+.room-userbar-add:hover {
+    animation-name: colorchange-ani;
+    animation-duration: 0.2s;
+    animation-timing-function: ease-out;
+    color: #FFFFFF;
+    background-color: #22C922;
+}
+
+.room-userbar-split {
+    padding-top: 2px;
+}
+
+.room-userbar-add-button {
+    padding-top: 10px;
+}
+
+@keyframes bright-ani {
+    from {
+        filter: brightness(0.5);
+    }
+
+    to {
+        filter: brightness(1);
+    }
+}
+
+@keyframes colorchange-ani {
+    from {
+        color: #22C922;
+        background-color: #37393B;
+    }
+
+    to {
+        color: #FFFFFF;
+        background-color: #22C922;
+    }
 }

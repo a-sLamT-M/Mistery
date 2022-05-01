@@ -20,6 +20,14 @@ namespace MisteryBlazor.StringUtils
             return randomBytes;
         }
 
+        public static int GetIntId()
+        {
+            byte[] buffer = Guid.NewGuid().ToByteArray();
+            int root = BitConverter.ToInt32(buffer, 0);
+            Random random = new Random(root);
+            return random.Next(0, Int32.MaxValue - 1);
+        }
+
         public static string ToASCIIByte(this string str)
         {
             try
@@ -29,7 +37,7 @@ namespace MisteryBlazor.StringUtils
                 var byteArray = Encoding.ASCII.GetBytes(input);
                 foreach (var value in byteArray)
                 {
-                    sb.Append(value+rd).Append(split);
+                    sb.Append(value + rd).Append(split);
                 }
                 return byteArray.Length > 0 ? sb.ToString() : input;
             }
@@ -46,7 +54,7 @@ namespace MisteryBlazor.StringUtils
                 List<byte> b = new();
                 for (int i = 0; i <= input.Length - 2; i++)
                 {
-                    b.Add(Convert.ToByte(Convert.ToInt32(input[i])-rd));
+                    b.Add(Convert.ToByte(Convert.ToInt32(input[i]) - rd));
                 }
                 string result = Encoding.ASCII.GetString(b.ToArray()).ToStringFromBase64();
                 return result;
