@@ -26,5 +26,6 @@ namespace MisteryBlazor.Data.Context
         public DbSet<ChannelMessage> ChannelMessages { get; set; }
         public DbSet<CustomPermissionRole> CustomPermissionRoles { get; set; }
         public DbSet<IfPrivateVisiableRoleGroup> IfPrivateVisiableGroups { get; set; }
+        public DbSet<UserAvatars> UserAvatars { get; set; }
     }
 }

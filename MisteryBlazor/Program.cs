@@ -25,7 +25,7 @@ builder.Services.AddDefaultIdentity<MisteryIdentityUser>((IdentityOptions option
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
+builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<MisteryIdentityUser>>();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddAuthorization(options =>
 {
@@ -37,6 +37,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 });
 builder.Services.AddMudServices();
 
+// builder.Services.AddScoped<IDbService, DataService>();
 
 var app = builder.Build();
 

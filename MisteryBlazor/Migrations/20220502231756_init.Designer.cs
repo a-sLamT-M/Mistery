@@ -12,7 +12,7 @@ using MisteryBlazor.Data.Context;
 namespace MisteryBlazor.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220502014107_init")]
+    [Migration("20220502231756_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -480,6 +480,28 @@ namespace MisteryBlazor.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("MisteryBlazor.Data.User.UserAvatars", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<byte[]>("CreationTime")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("Uid")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Uid");
+
+                    b.ToTable("UserAvatars");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -646,6 +668,17 @@ namespace MisteryBlazor.Migrations
                     b.Navigation("Sender");
 
                     b.Navigation("Target");
+                });
+
+            modelBuilder.Entity("MisteryBlazor.Data.User.UserAvatars", b =>
+                {
+                    b.HasOne("MisteryBlazor.Data.User.MisteryIdentityUser", "Sender")
+                        .WithMany()
+                        .HasForeignKey("Uid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("MisteryBlazor.Data.GroupsModel.Channel", b =>

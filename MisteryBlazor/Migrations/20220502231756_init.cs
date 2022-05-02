@@ -205,6 +205,25 @@ namespace MisteryBlazor.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserAvatars",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Uid = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CreationTime = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserAvatars", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserAvatars_AspNetUsers_Uid",
+                        column: x => x.Uid,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Channels",
                 columns: table => new
                 {
@@ -442,6 +461,11 @@ namespace MisteryBlazor.Migrations
                 table: "IfPrivateVisiableGroups",
                 column: "ChannelId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserAvatars_Uid",
+                table: "UserAvatars",
+                column: "Uid");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -472,6 +496,9 @@ namespace MisteryBlazor.Migrations
 
             migrationBuilder.DropTable(
                 name: "GroupMembers");
+
+            migrationBuilder.DropTable(
+                name: "UserAvatars");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

@@ -10,8 +10,6 @@ namespace MisteryBlazor.Data.User
     {
         public IList<Group> Groups { get; set; } = new List<Group>();
         public IList<ChannelMessage> ChannelMessages { get; set; } = new List<ChannelMessage>();
-        [Timestamp]
-        public byte[] CreationTime { get; set; }
         public MisteryIdentityUser() : base()
         {
             Id = str.GetIntId().ToString();
@@ -21,5 +19,7 @@ namespace MisteryBlazor.Data.User
         {
             UserName = userName;
         }
+        [Timestamp]
+        public byte[] CreationTime { get; set; }
     }
 }
