@@ -10,7 +10,7 @@ namespace MisteryBlazor.Data.MessagesModel
         [Key]
         public int Id { get; set; }
         [ForeignKey("Sender")]
-        public int SenderId { get; set; }
+        public string SenderId { get; set; }
         [ForeignKey("Channel")]
         public int ChannelId { get; set; }
         [Required]

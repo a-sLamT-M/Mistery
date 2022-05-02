@@ -15,7 +15,7 @@ namespace MisteryBlazor.Data.GroupsModel
         public int GroupId { get; set; }
         [Required]
         [ForeignKey("Member")]
-        public int GroupMemberId { get; set; }
+        public string GroupMemberId { get; set; }
         [Required]
         public bool IsDeleted { get; set; }
         public MisteryIdentityUser Member { get; set; }

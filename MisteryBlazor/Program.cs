@@ -5,17 +5,23 @@ using Microsoft.EntityFrameworkCore;
 using MisteryBlazor.Areas.Identity;
 using MisteryBlazor.Data;
 using MisteryBlazor.Data.Context;
+using MisteryBlazor.Data.Seeder;
 using MisteryBlazor.Data.User;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection"); ;
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Host.ConfigureLogging(logging =>
+{
+    logging.AddConsole();
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddDefaultIdentity<MisteryIdentityUser>((IdentityOptions options) => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<MisteryBlazor.Data.Context.AppDbContext>();
+    .AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -30,7 +36,17 @@ builder.Services.Configure<IdentityOptions>(options =>
 
 });
 builder.Services.AddMudServices();
+
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var logger = services.GetService<ILoggerFactory>().CreateLogger<Program>();
+    Seeder seed = new Seeder(services, logger);
+    await seed.Seed();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

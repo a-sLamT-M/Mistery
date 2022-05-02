@@ -8,14 +8,14 @@ namespace MisteryBlazor.Data.MessagesModel
     {
         [Key]
         public int Id { get; set; }
-        public MisteryIdentityUser Sender { get; set; }
-        public MisteryIdentityUser Target { get; set; }
         [ForeignKey("Sender")]
-        public int SenderId { get; set; }
+        public string SenderId { get; set; }
         [ForeignKey("Target")]
-        public int TargetUserId { get; set; }
+        public string TargetUserId { get; set; }
         [Required]
         public string MessageContent { get; set; }
+        public MisteryIdentityUser Sender { get; set; }
+        public MisteryIdentityUser Target { get; set; }
         [Timestamp]
         public byte[] CreationTime { get; set; }
     }

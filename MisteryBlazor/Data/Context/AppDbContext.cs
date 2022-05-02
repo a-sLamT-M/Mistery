@@ -7,15 +7,12 @@ using MisteryBlazor.Data.User;
 
 namespace MisteryBlazor.Data.Context
 {
-    public class AppDbContext : IdentityDbContext<
-        MisteryIdentityUser,
-        MisteryIdentityRole,
-        int
-    >
+    public class AppDbContext : IdentityDbContext<MisteryIdentityUser>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
         {
+
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

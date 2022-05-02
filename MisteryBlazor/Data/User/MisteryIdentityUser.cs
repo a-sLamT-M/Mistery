@@ -2,18 +2,24 @@
 using MisteryBlazor.Data.GroupsModel;
 using MisteryBlazor.Data.MessagesModel;
 using MisteryBlazor.StringUtils;
+using System.ComponentModel.DataAnnotations;
 namespace MisteryBlazor.Data.User
 {
     //Cannot insert explicit value for identity column in table when IDENTITY_INSERT is set to OFF.
-    public class MisteryIdentityUser : IdentityUser<int>
+    public class MisteryIdentityUser : IdentityUser
     {
-        public string Avatar { get; set; }
         public IList<Group> Groups { get; set; } = new List<Group>();
         public IList<ChannelMessage> ChannelMessages { get; set; } = new List<ChannelMessage>();
+        [Timestamp]
+        public byte[] CreationTime { get; set; }
         public MisteryIdentityUser() : base()
         {
-            Id = str.GetIntId();
+            Id = str.GetIntId().ToString();
             SecurityStamp = Guid.NewGuid().ToString();
+        }
+        public MisteryIdentityUser(string userName) : this()
+        {
+            UserName = userName;
         }
     }
 }

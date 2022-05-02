@@ -3,12 +3,11 @@ using MisteryBlazor.StringUtils;
 
 namespace MisteryBlazor.Data.User
 {
-    public class MisteryIdentityRole : IdentityRole<int>
+    public class MisteryIdentityRole : IdentityRole
     {
-
         public MisteryIdentityRole()
         {
-            Id = str.GetIntId();
+            Id = str.GetIntId().ToString();
         }
 
         public MisteryIdentityRole(string roleName) : this()

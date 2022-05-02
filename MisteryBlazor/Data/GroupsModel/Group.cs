@@ -13,7 +13,7 @@ namespace MisteryBlazor.Data.GroupsModel
         public string GroupName { get; set; }
         [Required]
         [ForeignKey("Owner")]
-        public int GroupOwnerId { get; set; }
+        public string GroupOwnerId { get; set; }
         [Required]
         public bool IsDeleted { get; set; }
         public MisteryIdentityUser Owner { get; set; }
