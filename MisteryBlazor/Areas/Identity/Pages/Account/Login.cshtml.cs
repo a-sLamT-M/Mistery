@@ -17,11 +17,13 @@ namespace MisteryBlazor.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<MisteryIdentityUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly UserManager<MisteryIdentityUser> _userManager;
 
-        public LoginModel(SignInManager<MisteryIdentityUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<MisteryIdentityUser> signInManager, UserManager<MisteryIdentityUser> manager, ILogger<LoginModel> logger)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _userManager = manager;
         }
 
         /// <summary>
@@ -101,13 +103,18 @@ namespace MisteryBlazor.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
+            var user = await _userManager.FindByEmailAsync(Input.Email);
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty, "该邮箱不存在");
+                return Page();
+            }
             if (ModelState.IsValid)
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(user, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in: " + Input.Email);
@@ -124,7 +131,7 @@ namespace MisteryBlazor.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, "邮箱或密码有误");
                     return Page();
                 }
             }

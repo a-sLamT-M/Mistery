@@ -2,26 +2,23 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using MisteryBlazor.Data.User;
 using MisteryBlazor.StringUtils;
+using System.ComponentModel.DataAnnotations;
 
 namespace MisteryBlazor.Areas.Identity.Pages.Account.Manage
 {
     public class IndexModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<MisteryIdentityUser> _userManager;
+        private readonly SignInManager<MisteryIdentityUser> _signInManager;
 
         public IndexModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+            UserManager<MisteryIdentityUser> userManager,
+            SignInManager<MisteryIdentityUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -63,7 +60,7 @@ namespace MisteryBlazor.Areas.Identity.Pages.Account.Manage
             public string UserName { get; set; }
         }
 
-        private async Task LoadAsync(IdentityUser user)
+        private async Task LoadAsync(MisteryIdentityUser user)
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
@@ -106,6 +103,11 @@ namespace MisteryBlazor.Areas.Identity.Pages.Account.Manage
 
             if (Input.PhoneNumber != phoneNumber)
             {
+                if (Input.PhoneNumber.ToASCIIByte().Length >= 230)
+                {
+                    ModelState.AddModelError(string.Empty, "字符过长");
+                    return Page();
+                }
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
                 if (!setPhoneResult.Succeeded)
                 {
@@ -116,6 +118,11 @@ namespace MisteryBlazor.Areas.Identity.Pages.Account.Manage
 
             if (Input.UserName != userName.ToStringFromASCIIByte() || Input.UserName.Trim() != string.Empty)
             {
+                if (Input.UserName.ToASCIIByte().Length >= 230)
+                {
+                    ModelState.AddModelError(string.Empty, "字符过长");
+                    return Page();
+                }
                 var setUserNameResult = await _userManager.SetUserNameAsync(user, Input.UserName.ToASCIIByte());
                 if (!setUserNameResult.Succeeded)
                 {
