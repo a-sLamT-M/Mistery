@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MisteryBlazor.Data.GroupsModel.PermissionModel
 {
@@ -8,10 +7,8 @@ namespace MisteryBlazor.Data.GroupsModel.PermissionModel
         [Key]
         public int Id { get; set; }
         [Required]
-        [ForeignKey("Channel")]
         public int ChannelId { get; set; }
-        public Channel Channel { get; set; }
-        public List<CustomPermissionRole> CustomPermissionRole { get; set; } = new List<CustomPermissionRole>();
+        public int RoleId { get; set; }
         [Timestamp]
         public byte[] CreationTime { get; set; }
     }

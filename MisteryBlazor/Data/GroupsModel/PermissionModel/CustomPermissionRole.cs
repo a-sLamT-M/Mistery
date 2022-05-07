@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MisteryBlazor.Data.GroupsModel.PermissionModel
 {
@@ -7,17 +6,10 @@ namespace MisteryBlazor.Data.GroupsModel.PermissionModel
     {
         [Key]
         public int Id { get; set; }
-        public int BaseCustomPermissionRoleId { get; set; }
-        [ForeignKey("BaseCustomPermissionRoleId")]
-        public CustomPermissionRole BaseCustomPermissionRole { get; set; }
-        [ForeignKey("Group")]
+        [Required]
         public int GroupId { get; set; }
-        public Group Group { get; set; }
-        [ForeignKey("IfPrivateVisiableRoleGroup")]
-        public int RoleGroupId { get; set; }
         [Required]
         public string CustomPermissionRoleName { get; set; } = "Everyone";
-        public IfPrivateVisiableRoleGroup IfPrivateVisiableRoleGroup { get; set; }
 
         // ------------------------------------------------------------------------
         public bool CanSendMessage { get; set; } = true;

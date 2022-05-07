@@ -1,7 +1,4 @@
-﻿@code {
-
-}
-<div class="room-sidebar-channel">
+﻿<div class="room-sidebar-channel">
     <span class="room-sidebar-channel-icon">
         <MudIcon Size="Size.Small" Icon="@Icons.Outlined.Circle" style="width: 15px; height: 15px;"/>
     </span>
@@ -9,3 +6,8 @@
         Test
     </div>
 </div>
+
+@code {
+    [Parameter]
+    public int gid { get; set; }
+}

@@ -5,6 +5,9 @@
 .room {
     display: flex;
 }
+::-webkit-scrollbar {
+    display: none
+}
 
 .room-page-MainLayout {
     display: flex;
@@ -22,11 +25,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
-    margin-left: 6px;
-    background-color: #262829;
+    padding: 11px;
     color: white;
-    border-bottom: 3px solid #1F2022;
 }
 
 .room-sidebar-channels {
@@ -71,9 +71,9 @@
     cursor: pointer;
 }
 
-    .room-sidebar-addchannel:hover {
-        color: #B3B3B3;
-    }
+.room-sidebar-addchannel:hover {
+    color: #B3B3B3;
+}
 
 .room-sidebar-channel:hover {
     color: #CCCCCC;
@@ -105,9 +105,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #1F2021;
     color: gray;
-    border-top: 2px solid #282828;
 }
 
 .room-sidebar-voice-VoiceInfo {
@@ -135,6 +133,7 @@
 .room-sidebar-voice-voiceInfoIco, .room-sidebar-voice-icons, .room-sidebar-profile-icons {
     display: flex;
     align-items: center;
+    color: gray;
 }
 
 .room-sidebar-voice-icons, room-sidebar-profile-icons {
@@ -170,12 +169,12 @@
     margin-top: -0.1%;
     margin-left: -2px;
     font-size: x-small;
+    color: gray;
 }
 
 .room-header {
-    background-color: #272829;
     display: flex;
-    padding: 5px;
+    padding: 9px;
     justify-content: space-between;
     align-items: center;
     color: gray;
@@ -209,12 +208,13 @@
     align-items: center;
     border-radius: 5px;
     padding-left: 10px;
-    margin-top: 1px; 
+    padding: 5px;
 }
 .room-header-right-icon {
     margin-right: 10px;
     display: flex;
     align-items: center;
+    color: gray;
 }
 
 .room-header-right-ico-notification, .room-header-right-ico-locationedit, .room-header-right-options, .room-header-right-ico-peoplealt {
@@ -228,11 +228,12 @@
 .room-page-MainLayout-HeaderBar {
     display: flex;
     flex-direction: column;
-    flex: 3.4;
+    flex: 1;
 }
 
 .room-header-right-search-input {
     background: transparent;
+    padding-top: 3px;
     display: flex;
     align-items: center;
     color: #CCCCCC;
@@ -320,24 +321,18 @@
 
 .room-mainlayout-sidebar {
     display: flex;
-    flex: 1;
+    flex: 0.22;
 }
 
 .room-userbar {
-    padding: 15px;
-    background-color: #1D1E1F;
+    padding: 10px;
+    margin-right: 0px;
 }
 
 .room-userbar-avatar {
+    align-content: center;
     padding-bottom: 10px;
-}
-
-.room-userbar-add {
-    color: #22C922;
-    width: 55px;
-    height: 55px;
-    border-radius: 100px;
-    background-color: #37393B;
+    padding-left: 3px;
 }
 
 .room-userbar-add-ico-plus {
@@ -347,40 +342,56 @@
 }
 
 .room-userbar-groups-func {
-    padding-top: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 .room-userbargroup {
     display: flex;
     flex-direction: column;
-    padding-bottom: 10px;
-}
-
-.room-userbargroup-avatar {
+    flex: 1;
+    padding-top: 5px;
+    padding-bottom: 3px;
     filter: brightness(0.5);
 }
 
-.room-userbargroup-avatar:hover {
-    animation-name: bright-ani;
-    animation-duration: 0.2s;
-    animation-timing-function: ease-out;
+.room-userbargroup-onclick {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding-top: 5px;
+    padding-bottom: 3px;
     filter: brightness(1);
 }
 
-.room-userbar-add:hover {
-    animation-name: colorchange-ani;
+.room-userbargroup-avatar {
+    filter: brightness(1);
+}
+.room-userbargroup:hover {
+    animation-name: bright-ani;
     animation-duration: 0.2s;
     animation-timing-function: ease-out;
-    color: #FFFFFF;
-    background-color: #22C922;
+    filter: brightness(0.8);
+}
+
+.room-userbargroup:not(:hover) {
+    animation-name: reverse-bright-ani;
+    animation-duration: 0.2s;
+    animation-timing-function: ease-out;
+    filter: brightness(0.5);
+}
+
+.room-userbar-scroll {
+    padding: 3px;
+    height: 91vh;
+    overflow: scroll;
 }
 
 .room-userbar-split {
-    padding-top: 2px;
 }
 
 .room-userbar-add-button {
-    padding-top: 10px;
+    padding-top: 5px;
 }
 
 @keyframes bright-ani {
@@ -389,10 +400,18 @@
     }
 
     to {
-        filter: brightness(1);
+        filter: brightness(0.8);
     }
 }
+@keyframes reverse-bright-ani {
+    from {
+        filter: brightness(0.8);
+    }
 
+    to {
+        filter: brightness(0.5);
+    }
+}
 @keyframes colorchange-ani {
     from {
         color: #22C922;
@@ -404,3 +423,13 @@
         background-color: #22C922;
     }
 }
+
+.room-dialog {
+    background: #262829;
+}
+
+.room-dialog-text {
+    color: #ffffff;
+}
+
+

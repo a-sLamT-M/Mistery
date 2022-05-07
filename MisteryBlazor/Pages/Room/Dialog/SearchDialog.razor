@@ -1,0 +1,12 @@
+﻿<MudDialog Class="mud-theme-primary room-group-dialog">
+    <DialogContent>
+        <div class="room-group-add-join"></div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Color="Color.Error">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    void Cancel() => MudDialog.Cancel();
+}

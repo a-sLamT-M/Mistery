@@ -7,14 +7,17 @@ using MisteryBlazor.Data;
 using MisteryBlazor.Data.Context;
 using MisteryBlazor.Data.Seeder;
 using MisteryBlazor.Data.User;
+using MisteryBlazor.Services.DAL;
+using MudBlazor;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+// var connectionString = builder.Configuration.GetConnectionString("ReleaseConnection");
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
 builder.Host.ConfigureLogging(logging =>
 {
-    logging.AddConsole();
+    builder.Logging.ClearProviders();
+    builder.Logging.AddConsole();
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -27,6 +30,9 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<MisteryIdentityUser>>();
 builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services
+    .AddScoped<UserDataService>()
+    .AddScoped<GroupDataService>();
 builder.Services.AddAuthorization(options =>
 {
     options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
@@ -35,15 +41,21 @@ builder.Services.Configure<IdentityOptions>(options =>
 {
 
 });
-builder.Services.AddMudServices();
-
-// builder.Services.AddScoped<IDbService, DataService>();
+builder.Services.AddMudServices(config =>
+{
+    config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomLeft;
+    config.SnackbarConfiguration.VisibleStateDuration = 3000;
+    config.SnackbarConfiguration.HideTransitionDuration = 200;
+    config.SnackbarConfiguration.ShowTransitionDuration = 200;
+});
 
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<AppDbContext>();
+    context.Database.Migrate();
     var logger = services.GetService<ILoggerFactory>().CreateLogger<Program>();
     Seeder seed = new Seeder(services, logger);
     await seed.Seed();

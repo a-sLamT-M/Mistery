@@ -1,19 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MisteryBlazor.Data.GroupsModel
+namespace MisteryBlazor.Data.User
 {
-    public class GroupMember
+    public class UserInRole
     {
         [Key]
         public int Id { get; set; }
         [Required]
-        public int CustomPermissionRoleId { get; set; }
+        public string Uid { get; set; }
         [Required]
+        public int RoleId { get; set; }
         public int GroupId { get; set; }
-        [Required]
-        public string GroupMemberId { get; set; }
-        [Required]
-        public bool IsDeleted { get; set; }
         [Timestamp]
         public byte[] CreationTime { get; set; }
     }

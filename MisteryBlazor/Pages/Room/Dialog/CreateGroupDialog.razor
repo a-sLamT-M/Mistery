@@ -1,0 +1,87 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using System.Text
+@using Microsoft.Extensions.Logging
+@using MisteryBlazor.Services.DAL
+@inject ILogger<CreateGroupDialog> Logger
+@inject GroupDataService gps;
+@inject ISnackbar Snackbar
+
+<MudForm>
+    <MudDialog Class="mud-theme-primary room-dialog-creategroup mb-3">
+        <DialogContent>
+            <MudPaper class="mud-theme-primary">
+                <MudTextField T="string" @bind-Text="@m.GroupName" Label="Group Name" Required="true" RequiredError="Group Name is required!"
+                              Validation="(new Func<string, IEnumerable<string>>(Validation))" Variant="Variant.Filled" Margin="Margin.Dense"/>
+            </MudPaper>
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="Cancel" Color="Color.Error">Cancel</MudButton>
+            <MudButton OnClick="Submit" Color="Color.Inherit">Ok</MudButton>
+        </DialogActions>
+    </MudDialog>
+</MudForm>   
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    class InputModel
+    {
+        [Required]
+        [StringLength(90,ErrorMessage = "该名称过长或过短", MinimumLength = 1)] 
+        public string GroupName { get; set; } = String.Empty;
+    }
+    [ParameterAttribute]
+    public string Uid { get; set; } = String.Empty;
+
+    InputModel m = new();
+
+    private void Submit()
+    {
+        Validation(m.GroupName);
+        if (m.GroupName.Length <= 0)
+        {
+            Logger.LogInformation("STILL EMPTY! Create Group Name and ID: " + m.GroupName + "/" + Uid);
+            Snackbar.Add("Failed to create a group.", Severity.Error);
+            return;
+        }
+        int id = Create();
+        if (id > 0)
+        {
+            Snackbar.Add("Create group successfully. ID: "+id, Severity.Success);
+            MudDialog.Close(DialogResult.Ok(id));
+        }
+        else
+        {
+            Snackbar.Add("Failed to create a group.", Severity.Error);
+            MudDialog.Cancel();
+        }
+    }
+
+    private int Create()
+    {
+        StringBuilder log = new StringBuilder();
+        log.Append("User：").Append(Uid).Append(" ").Append("is creating group ").Append(m.GroupName);
+        var result = gps.CreateNewGroup(log.ToString(),m.GroupName, Uid);
+        return result.Entity.Id;
+    }
+
+    private IEnumerable<string> Validation(string str)
+    {
+        if (str is null)
+        {
+            yield return "Group Name is required!";
+            yield break;
+        }
+        if (str.Length >= 89)
+        {
+            yield return "名称过长";
+            yield break;
+        }
+        if (str.Length < 1)
+        {
+            yield return "";
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+}

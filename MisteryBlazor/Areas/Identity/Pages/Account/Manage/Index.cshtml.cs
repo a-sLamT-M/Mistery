@@ -118,6 +118,11 @@ namespace MisteryBlazor.Areas.Identity.Pages.Account.Manage
 
             if (Input.UserName != userName.ToStringFromASCIIByte() || Input.UserName.Trim() != string.Empty)
             {
+                if (Input.UserName.ToASCIIByte() is null || Input.UserName.ToASCIIByte().Length <= 0)
+                {
+                    ModelState.AddModelError(string.Empty, "名字不能为空");
+                    return Page();
+                }
                 if (Input.UserName.ToASCIIByte().Length >= 230)
                 {
                     ModelState.AddModelError(string.Empty, "字符过长");

@@ -1,36 +1,24 @@
 ﻿@page "/test"
+@using System.Security.Claims
+@using MisteryBlazor.Data.GroupsModel
+@using MisteryBlazor.Services.DAL
+@inject GroupDataService gps;
 
-<div class="room-sidebar">
+<div class="room-sidebar mud-theme-primary">
 
-    <div class="room-sidebar-top">
+    <div class="room-sidebar-top mud-theme-primary mud-elevation-1">
         <div class="fs-4 fw-bold room-sidebar-top-text">Group</div>
         <span>
             <MudIcon Icon="@Icons.Filled.ExpandMore" Size="Size.Medium"/>
         </span>
     </div>
 
-    <div class="room-sidebar-channels">
-        <div class="room-sidebar-channels-header">
-            <div class="room-sidebar-header">
-                <div class="room-sidebar-expandchannel">
-                    <MudIcon Icon="@Icons.Filled.ExpandMore" Size="Size.Small"/>
-                </div>
-                <div class="fs-7 fw-bold room-sidebar-channels-text-channels">Channels</div>
-            </div>
-            <span Class="room-sidebar-addchannel">
-                <MudIcon Icon="@Icons.Filled.Add" Size="Size.Medium"></MudIcon>
-            </span>
-        </div>
+    <div class="room-sidebar-channels mud-elevation-2">
 
-        <div class="room-sidebar-channels-list">
-            <_RoomSidebarChannel/>
-            <_RoomSidebarChannel/>
-            <_RoomSidebarChannel/>
-        </div>
     </div>
 
-    <div class="room-sidebar-voice" style="display: none;">
-        <div class="room-sidebar-voice-voiceInfoIco">
+    <div class="room-sidebar-voice mud-theme-secondary" style="display: none;">
+        <div class="room-sidebar-voice-voiceInfoIco mud-theme-secondary">
             <span class="room-sidebar-voice-voiceico">
                 <MudIcon Icon="@Icons.Outlined.SignalCellularAlt" Size="Size.Medium"></MudIcon>
             </span>
@@ -49,13 +37,13 @@
         </div>
     </div>
 
-    <div class="room-sidebar-profile">
+    <div class="room-sidebar-profile mud-theme-secondary mud-elevation-5" >
         <span class="room-sidebar-profile-avatar">
             <MudAvatar Size="Size.Medium"></MudAvatar>
         </span>
         <div class="room-sidebar-profile-info">
-            <div class="fs-7 room-sidebar-profile-info-name fw-bold">Lam T.</div>
-            <div class="room-sidebar-profile-info-id"># ID</div>
+            <div class="fs-7 room-sidebar-profile-info-name fw-bold">@UserName</div>
+            <div class="room-sidebar-profile-info-id">@userId</div>
         </div>
         <div class="room-sidebar-profile-icons">
             <span class="room-sidebar-profile-icons-mic">
@@ -72,5 +60,19 @@
 </div>
 
 @code {
+    [ParameterAttribute]
+    public string userId { get; set; }
+    [ParameterAttribute]
+    public Group group { get; set; }
+    [ParameterAttribute]
+    public string UserName { get; set; }
+    public IList<Channel> currectChannels { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        if (group is not null)
+        {
+            currectChannels = await gps.GetChannelFromGroupAsync("RoomSideBar: Getting Channels.", group.Id);
+        }
+    }
 }

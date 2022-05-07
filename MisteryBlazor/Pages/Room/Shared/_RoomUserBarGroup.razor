@@ -1,8 +1,25 @@
-﻿@code {
-
-}
-<div class="room-userbargroup">
-    <span class="room-userbargroup-avatar">
-        <MudAvatar Size="Size.Large">U</MudAvatar>
-    </span>
+﻿<div id="@id" class="room-userbargroup ">
+    <MudIconButton Style="height: 50px; width: 50px;" class="rounded-circle" Size="Size.Large" OnClick="OnClick.Invoke">
+        <span class="room-userbargroup-avatar">
+            <MudAvatar Style="height: 50px; width: 50px;">@groupName[0]</MudAvatar>
+        </span>
+    </MudIconButton>
 </div>
+
+@code {
+    [ParameterAttribute]
+    public string groupName { get; set; }
+    [ParameterAttribute]
+    public string avatarName { get; set; } = String.Empty;
+    [ParameterAttribute]
+    public Action OnClick { get; set; }
+    [ParameterAttribute] 
+    public string id { get; set; }
+    [ParameterAttribute]
+    public string avatarUri { get; set; }
+
+    private void OnGroupClicked()
+    {
+        OnClick.Invoke();
+    }
+}
