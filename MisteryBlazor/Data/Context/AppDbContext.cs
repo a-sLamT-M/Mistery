@@ -30,5 +30,6 @@ namespace MisteryBlazor.Data.Context
         public DbSet<IfPrivateVisiableRoleGroup> IfPrivateVisiableGroups { get; set; }
         public DbSet<Relation> Relations { get; set; }
         public DbSet<UserInRole> UserInRoles { get; set; }
+        public DbSet<ChannelCategory> CategoryCategories { get; set; }
     }
 }

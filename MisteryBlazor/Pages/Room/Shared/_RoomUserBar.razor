@@ -5,11 +5,13 @@
 @using System.Security.Claims
 @using System.Text
 @using MisteryBlazor.Pages.Room.Dialog
+@using MisteryBlazor.Services.DataManager
 @using MisteryBlazor.StringUtils
 @using static System.Linq.Enumerable
 @inject GroupDataService gps;
-@inject IDialogService DialogService
+@inject IDialogService DialogService;
 @inject NavigationManager uriHelper;
+@inject GroupsManager Gm;
 @inject IJSRuntime JS;
 
 @if (groups is null)
@@ -34,10 +36,15 @@ else
                     {
                         StringBuilder sb = new();
                         <div class="room-userbar-groups-func">
-                            @foreach (var group in groups)
+                            @foreach (var group in comparedGroups)
                             {
-                                sb.Append("room-groupcom-").Append(group.Id.ToString());
-                                <_RoomUserBarGroup groupName=@group.GroupName.ToStringFromASCIIByte() OnClick="() => { GroupCompOnClick(group.Id);}" id="@sb.ToString()"></_RoomUserBarGroup>
+                                sb.Append("room-groupcom-").Append(group.Key.Id.ToString());
+                                <_RoomUserBarGroup
+                                    groupName=@group.Key.GroupName.ToStringFromASCIIByte()
+                                    OnClick="() => { GroupCompOnClick(group.Key.Id); }" Id="@sb.ToString()"
+                                    IsOwned="group.Value"
+                                    HandleDelete="() => { Gm.DeleteGroup(userId, group.Key.Id); }"
+                                />
                                 sb.Clear();
                             }
                         </div>
@@ -47,12 +54,12 @@ else
                     </span>
                     <div class="room-userbar-add-button pt-3">
                         <div class="room-userbar-add">
-                            <MudIconButton Style="height: 50px; width: 50px;" class="rounded-circle " Icon="@Icons.Filled.GroupAdd" Variant="Variant.Filled" Color="Color.Success" Size="Size.Large" @onclick="OpenAddGroupDialog"/>
+                            <MudIconButton Style="height: 50px; width: 50px;" class="rounded-circle " Icon="@Icons.Filled.GroupAdd" Variant="Variant.Filled" Color="MudBlazor.Color.Success" Size="Size.Large" @onclick="OpenAddGroupDialog"/>
                         </div>
                     </div>
                     <div class="room-userbar-add-button pt-3">
                         <div class="room-userbar-add">
-                            <MudIconButton Style="height: 50px; width: 50px;" class="rounded-circle" Icon="@Icons.TwoTone.Search" Variant="Variant.Filled" Color="Color.Success" Size="Size.Large"/>
+                            <MudIconButton Style="height: 50px; width: 50px;" class="rounded-circle" Icon="@Icons.TwoTone.Search" Variant="Variant.Filled" Color="MudBlazor.Color.Success" Size="Size.Large"/>
                         </div>
                     </div>
                 </div>
@@ -67,17 +74,23 @@ else
     [ParameterAttribute]
     public IList<Group> groups { get; set; }
     [ParameterAttribute]
+    public Dictionary<Group, bool> comparedGroups { get; set; }
+    [ParameterAttribute]
     public int currectGroup { get; set; } = 0;
     [ParameterAttribute]
     public int lastGroup { get; set; } = 0;
-    [Parameter]
+    [ParameterAttribute]
     public EventCallback<int> OnCurrectGroupChanged { get; set; }
+    [ParameterAttribute]
+    public EventCallback<IList<Group>> OnGroupAdded { get; set; }
+    [ParameterAttribute]
+    public EventCallback HandleDelete { get; set; }
 
     private async Task OpenAddGroupDialog()
     {
         var para = new DialogParameters();
         para.Add("Uid", userId);
-        DialogOptions options = new DialogOptions()
+        MudBlazor.DialogOptions options = new MudBlazor.DialogOptions()
         {
             CloseOnEscapeKey = true,
             CloseButton = true,
@@ -88,7 +101,8 @@ else
         var result = await dialog.Result;
         if (!result.Cancelled)
         {
-            groups = gps.GetGroupsFromUser("RoomUserBar: Getting Groups.", userId)!;
+            groups = await gps.GetGroupsFromUserAsync("RoomUserBar: Getting Groups.", userId);
+            await OnGroupAdded.InvokeAsync(groups);
         }
     }
 

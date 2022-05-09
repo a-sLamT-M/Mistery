@@ -2,10 +2,15 @@
 @using System.Security.Claims
 @using System.Text
 @using MisteryBlazor.Data.GroupsModel
+@using MisteryBlazor.Services
 @using MisteryBlazor.Services.DAL
+@using MisteryBlazor.Services.DataManager
 @using MisteryBlazor.StringUtils
 @inherits LayoutComponentBase
 @inject GroupDataService gps;
+@inject IJSRuntime js;
+@inject GroupsManager Gm;
+@inject AuthorizationManager Am;
 
 <head>
     <link href="BlazorMaterialUI.styles.css" rel="stylesheet" />
@@ -22,11 +27,17 @@
 <PageTitle>MisteryBlazor</PageTitle>
 <div class="room-page-MainLayout">
     <div class="room-mainlayout-sidebar">
-        <_RoomUserBar OnCurrectGroupChanged="gid => {SelectedGroupId=gid;}" userId=@userId groups="@groups"/>
+        <_RoomUserBar 
+            OnGroupAdded="() => Gm.InitAsync()" 
+            OnCurrectGroupChanged="gid => {Gm.SelectedGroupId=gid;}" 
+            userId=@Am.UserId 
+            groups="@Gm.Groups"
+            comparedGroups="@Gm.GroupsDictionary"
+            />
         @{
             StringBuilder UserId = new();
-            UserId.Append("# ").Append(userId);
-            <_RoomSideBar group=@selectedGroup UserName=@userName userId=@UserId.ToString()/>
+            UserId.Append("# ").Append(@Am.UserId);
+            <_RoomSideBar group=@Gm.SelectedGroup UserName=@Am.UserName userId=@UserId.ToString()/>
         }
     </div>
     <main class="room-page-MainLayout-HeaderBar">
@@ -35,55 +46,36 @@
     </main>
 </div>
 @code {
-    private string userId { get; set; }
-    private string userName { get; set; }
     private _RoomUserBar UserBar;
 
-    [CascadingParameter] 
-    private Task<AuthenticationState> authenticationState { get; set; }
-    private AuthenticationState authState;
-
     private bool _isDarkMode = true;
-
-    private Group selectedGroup;
-
-    private int selectGroupId = 0;
-
-    private int SelectedGroupId
-    {
-        set
-        {
-            selectGroupId = value;
-            selectedGroup = gps.GetGroupById("RoomMain: Getting Group", value);
-        }
-    }
-
-
-    private ClaimsPrincipal currectUser;
-    private IList<Group> groups;
-
     protected override async Task OnInitializedAsync()
     {
-        authState = await authenticationState;
-        currectUser = authState.User;
-        userId = currectUser.FindFirstValue(ClaimTypes.NameIdentifier);
-        userName = currectUser.FindFirstValue(ClaimTypes.Name).ToStringFromASCIIByte();
-        groups = await gps.GetGroupsFromUserAsync("RoomUserBar: Getting Groups.", userId);
+        Gm.InitAsync();
+        Am.InitAsync();
     }
-
-    MudTheme MisteryTheme = new MudTheme()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await js.InvokeVoidAsync("init");
+        }
+    }
+    readonly MudTheme MisteryTheme = new MudTheme()
     {
         Palette = new Palette()
         {
-            Dark = Colors.Shades.White,
-            GrayDark = Colors.Shades.White,
+
             Primary = Colors.Green.Default,
             Secondary = Colors.Green.Default,
             Tertiary = Colors.Green.Default,
             AppbarBackground = Colors.Green.Default,
         },
+
         PaletteDark = new Palette()
         {
+            Dark = Colors.Shades.White,
+            GrayDark = Colors.Shades.White,
             Secondary = Colors.Grey.Darken4, 
             Primary = (MudColor) "#262829",
             TextPrimary = Colors.Grey.Lighten4,
@@ -94,8 +86,10 @@
             TextSecondary = Colors.Grey.Darken1,
             TextDisabled = Colors.Grey.Default,
             ActionDefault= Colors.Grey.Default,
-            ActionDisabled= "#ABABAB"
-
+            ActionDisabled= "#ABABAB",
+            PrimaryContrastText = Colors.Grey.Lighten3,
+            BackgroundGrey = "#262829",
+            Surface = "#2D2F33",
         },
 
         LayoutProperties = new LayoutProperties()

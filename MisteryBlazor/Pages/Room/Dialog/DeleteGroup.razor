@@ -1,0 +1,17 @@
+﻿<Modal Title="删除群组"
+       Visible="@Visible"
+       OnOk="@HandleOk"
+       OnCancel="@HandleCancel">
+    <p>您真的要解散 @Context 吗？</p>
+    <p>没有撤回键！</p>
+</Modal>
+@code {
+    [ParameterAttribute] 
+    public bool Visible { get; set; } = false;
+    [ParameterAttribute]
+    public string Context { get; set; }
+    [ParameterAttribute]
+    public EventCallback HandleCancel { get; set; }
+    [ParameterAttribute]
+    public EventCallback HandleOk { get; set; }
+}

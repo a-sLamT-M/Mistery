@@ -15,8 +15,8 @@
             </MudPaper>
         </DialogContent>
         <DialogActions>
-            <MudButton OnClick="Cancel" Color="Color.Error">Cancel</MudButton>
-            <MudButton OnClick="Submit" Color="Color.Inherit">Ok</MudButton>
+            <MudButton OnClick="Cancel" Color="MudBlazor.Color.Error">Cancel</MudButton>
+            <MudButton OnClick="Submit" Color="MudBlazor.Color.Inherit">Ok</MudButton>
         </DialogActions>
     </MudDialog>
 </MudForm>   
@@ -34,7 +34,7 @@
 
     InputModel m = new();
 
-    private void Submit()
+    private async Task Submit()
     {
         Validation(m.GroupName);
         if (m.GroupName.Length <= 0)
@@ -43,7 +43,7 @@
             Snackbar.Add("Failed to create a group.", Severity.Error);
             return;
         }
-        int id = Create();
+        int id = await Create();
         if (id > 0)
         {
             Snackbar.Add("Create group successfully. ID: "+id, Severity.Success);
@@ -56,7 +56,7 @@
         }
     }
 
-    private int Create()
+    private async Task<int> Create()
     {
         StringBuilder log = new StringBuilder();
         log.Append("User：").Append(Uid).Append(" ").Append("is creating group ").Append(m.GroupName);

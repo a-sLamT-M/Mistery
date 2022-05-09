@@ -383,7 +383,7 @@
 
 .room-userbar-scroll {
     padding: 3px;
-    height: 91vh;
+    height: 88vh;
     overflow: scroll;
 }
 
@@ -431,5 +431,3 @@
 .room-dialog-text {
     color: #ffffff;
 }
-
-

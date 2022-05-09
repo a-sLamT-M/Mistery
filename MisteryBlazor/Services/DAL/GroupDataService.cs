@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using MisteryBlazor.Data.Context;
 using MisteryBlazor.Data.GroupsModel;
 using MisteryBlazor.Data.GroupsModel.PermissionModel;
@@ -62,7 +63,43 @@ namespace MisteryBlazor.Services.DAL
                 .Select(g => g.GroupId));
             var groupsSelected = groups.Where(m => groupId.Contains(m.Id));
             _logger.LogInformation(string.Empty, log);
+
             return groupsSelected.ToList();
+        }
+
+        public async Task<Dictionary<Group, bool>> CompareIfGroupsIsOnwedByUserAsync(string log, string uid,
+            IList<Group> groups)
+        {
+            Dictionary<Group, bool> groupsWithBools = new Dictionary<Group, bool>();
+            foreach (var group in groups)
+            {
+                if (group.GroupOwnerId == uid)
+                {
+                    groupsWithBools.Add(group, true);
+                }
+                else
+                {
+                    groupsWithBools.Add(group, false);
+                }
+            }
+            return groupsWithBools;
+        }
+        public Dictionary<Group, bool> CompareIfGroupsIsOnwedByUser(string log, string uid,
+            IList<Group> groups)
+        {
+            Dictionary<Group, bool> groupsWithBools = new Dictionary<Group, bool>();
+            foreach (var group in groups)
+            {
+                if (group.GroupOwnerId == uid)
+                {
+                    groupsWithBools.Add(group, true);
+                }
+                else
+                {
+                    groupsWithBools.Add(group, false);
+                }
+            }
+            return groupsWithBools;
         }
         public List<Group>? GetGroupsFromUser(string log, string uid)
         {
@@ -124,58 +161,6 @@ namespace MisteryBlazor.Services.DAL
             _logger.LogInformation(string.Empty, log);
             return Channels;
         }
-
-        public async Task CreateNewGroupAsync(string log, string groupName, string createrId)
-        {
-            _logger.LogInformation(string.Empty, log);
-
-            // add a mew group
-            var newGroup = await _context.Groups.AddAsync(new Group()
-            {
-                GroupName = groupName,
-                GroupOwnerId = createrId,
-                IsDeleted = false
-            });
-            await _context.SaveChangesAsync();
-            //refresh this->groups (GroupDataService::Groups)
-            groups = _context.Groups.ToList();
-
-            // for this new group, add a new role named Everyone as a default role
-            var newGroupDefaultRole = await _context.CustomPermissionRoles.AddAsync(new CustomPermissionRole()
-            {
-                GroupId = newGroup.Entity.Id,
-                CustomPermissionRoleName = "Everyone"
-            });
-
-            // for this new group, add a new role named Administrator as a op role
-            var newGroupAdministratorRole = await _context.CustomPermissionRoles.AddAsync(new CustomPermissionRole()
-            {
-                GroupId = newGroup.Entity.Id,
-                CustomPermissionRoleName = "Administrator",
-                CanSendMessage = true,
-                HaveOP = true,
-                CanViewChannel = true,
-                CanManageChannel = true
-            });
-            await _context.SaveChangesAsync();
-            // add creator to group member table
-            var creator = await _context.GroupMembers.AddAsync(new GroupMember()
-            {
-                GroupId = newGroup.Entity.Id,
-                GroupMemberId = createrId,
-                IsDeleted = false
-            });
-
-            // add creator to administrator role
-            var UserInRole = await _context.UserInRoles.AddAsync(new UserInRole()
-            {
-                Uid = createrId,
-                RoleId = newGroupAdministratorRole.Entity.Id,
-                GroupId = newGroup.Entity.Id
-            }
-            );
-            await _context.SaveChangesAsync();
-        }
         public EntityEntry<Group> CreateNewGroup(string log, string groupName, string createrId)
         {
             _logger.LogInformation(string.Empty, log);
@@ -188,16 +173,13 @@ namespace MisteryBlazor.Services.DAL
                 IsDeleted = false
             });
             _context.SaveChanges();
-            //refresh this->groups (GroupDataService::Groups)
-            groups = _context.Groups.ToList();
-
             // for this new group, add a new role named Everyone as a default role
             var newGroupDefaultRole = _context.CustomPermissionRoles.Add(new CustomPermissionRole()
             {
                 GroupId = newGroup.Entity.Id,
                 CustomPermissionRoleName = "Everyone"
             });
-
+            _context.SaveChanges();
             // for this new group, add a new role named Administrator as a op role
             var newGroupAdministratorRole = _context.CustomPermissionRoles.Add(new CustomPermissionRole()
             {
@@ -216,7 +198,7 @@ namespace MisteryBlazor.Services.DAL
                 GroupMemberId = createrId,
                 IsDeleted = false
             });
-
+            _context.SaveChanges();
             // add creator to administrator role
             var UserInRole = _context.UserInRoles.Add(new UserInRole()
             {
@@ -226,6 +208,11 @@ namespace MisteryBlazor.Services.DAL
             }
             );
             _context.SaveChanges();
+
+            //refresh this->groups (GroupDataService::Groups)
+            //refresh this->GroupMembers (GroupDataService::GroupMembers)
+            groups = _context.Groups.ToList();
+            GroupMembers = _context.GroupMembers.ToList();
             return newGroup;
         }
     }

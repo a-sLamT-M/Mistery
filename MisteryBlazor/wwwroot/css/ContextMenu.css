@@ -1,0 +1,14 @@
+﻿.ContextMenuTemplate {
+    border: none !important;
+    border-style: hidden;
+    outline: none !important;
+    outline-color: black;
+    width: 120px;
+}
+
+.ContextMenuTemplate-Hidden {
+    border: none !important;
+    border-style: hidden;
+    outline: none !important;
+    outline-color: black;
+}

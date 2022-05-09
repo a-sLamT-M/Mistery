@@ -7,9 +7,12 @@ using MisteryBlazor.Data;
 using MisteryBlazor.Data.Context;
 using MisteryBlazor.Data.Seeder;
 using MisteryBlazor.Data.User;
+using MisteryBlazor.Services;
 using MisteryBlazor.Services.DAL;
+using MisteryBlazor.Services.DataManager;
 using MudBlazor;
 using MudBlazor.Services;
+using Animation = BlazorContextMenu.Animation;
 
 var builder = WebApplication.CreateBuilder(args);
 // var connectionString = builder.Configuration.GetConnectionString("ReleaseConnection");
@@ -31,22 +34,35 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<MisteryIdentityUser>>();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services
-    .AddScoped<UserDataService>()
-    .AddScoped<GroupDataService>();
+    .AddScoped<GroupsManager>()
+    .AddScoped<UserDataService>().AddScoped<AuthorizationManager>()
+    .AddScoped<GroupDataService>().AddAntDesign();
+
 builder.Services.AddAuthorization(options =>
 {
     options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
 });
+
 builder.Services.Configure<IdentityOptions>(options =>
 {
 
 });
+
 builder.Services.AddMudServices(config =>
 {
     config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomLeft;
     config.SnackbarConfiguration.VisibleStateDuration = 3000;
     config.SnackbarConfiguration.HideTransitionDuration = 200;
     config.SnackbarConfiguration.ShowTransitionDuration = 200;
+});
+
+builder.Services.AddBlazorContextMenu(options =>
+{
+    options.ConfigureTemplate("ContextMenuTemplate", template =>
+    {
+        template.MenuHiddenCssClass = "ContextMenuTemplate-Hidden";
+        template.Animation = Animation.FadeIn;
+    });
 });
 
 var app = builder.Build();
