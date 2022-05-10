@@ -10,12 +10,9 @@ namespace MisteryBlazor.Services
         private ILogger _Logger;
         private string userId { get; set; }
         private string userName { get; set; }
-
         public string UserId => userId;
         public string UserName => userName;
-
         private AuthenticationState authState;
-
         private ClaimsPrincipal currectUser;
         private readonly AuthenticationStateProvider _AuthenticationStateProvider;
         public AuthorizationManager(ILogger<AuthorizationManager> logger, AuthenticationStateProvider provider)

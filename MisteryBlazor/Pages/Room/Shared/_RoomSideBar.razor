@@ -1,26 +1,84 @@
 ﻿@page "/test"
 @using System.Security.Claims
+@using System.Text
 @using MisteryBlazor.Data.GroupsModel
+@using MisteryBlazor.Pages.Room.Dialog
 @using MisteryBlazor.Services.DAL
+@using MisteryBlazor.Services.DataManager
 @using MisteryBlazor.StringUtils
+@using Placement = AntDesign.Placement
 @inject GroupDataService gps;
+@inject ChannelsManager Cm;
+@inject GroupsManager Gm;
+@inject ISnackbar Snackbar;
 
-<div class="room-sidebar mud-theme-primary" oncontextmenu="return false;" 
-     @onclick="HandleRightClick_GroupNameBar" @onmouseup="HandleMouseUp_GroupNameBar">
-    @if (group is not null)
+<div class="room-sidebar mud-theme-primary" oncontextmenu="return false;">
+    @if (CurrectGroup.Key is not null && !CurrectGroup.Key.IsDeleted)
     {
-        <ContextMenuTrigger MenuId="room-siderbar-groupname-menu">
-            <div class="room-sidebar-top mud-theme-primary mud-elevation-1">
-                <div class="fs-4 fw-bold room-sidebar-top-text">@group.GroupName.ToStringFromASCIIByte()</div>
-                <span>
-                    <MudIcon Icon="@Icons.Filled.ExpandMore" Size="Size.Medium"/>
-                </span>
-            </div>
-        </ContextMenuTrigger>
+        <div class="room-sidebar-top mud-theme-primary mud-elevation-1">
+            <Dropdown Trigger="new Trigger[] { Trigger.ContextMenu }" Placement="Placement.BottomRight">
+                <Overlay>
+                    <Menu>
+                        <MenuItem>属性</MenuItem>
+                        @if (HasInvitePermission || IsOwned)
+                        {
+                            <MenuItem>创建邀请链接</MenuItem>
+                        }
+                    </Menu>
+                </Overlay>
+                <ChildContent>
+                    <div class="room-sidebar-textgroup">
+                        <div class="fs-4 fw-bold room-sidebar-top-text">@CurrectGroup.Key.GroupName.ToStringFromASCIIByte()</div>
+                        <div class="fs-7 room-sidebar-top-text-id"># @CurrectGroup.Key.Id</div>
+                    </div>
+                </ChildContent>
+            </Dropdown>
+        </div>
+        @if (ChannelsMap.Count <= 0)
+        {
+            <Dropdown Trigger="new Trigger[] { Trigger.ContextMenu }" Placement="Placement.BottomRight">
+                <Overlay>
+                    <Menu>
+                        @if (IsOwned)
+                        {
+                            <MenuItem OnClick="() => { D_Para.CreateCategoryVisible = true; }">创建一个类别</MenuItem>
+                        }
+                    </Menu>
+                </Overlay>
+                <ChildContent>
+                    @if (IsOwned)
+                    {
+                        <div class="room-sidebar-alert">
+                            <p>该群组还没有任何频道！</p></div>
+                        <div class="room-sidebar-alert-text">① 在<span style="font-weight: bold;"> 空白处 </span>
+                            右键添加一个类别</div>
+                        <div class="room-sidebar-alert-text">
+                            <p>② 在类别名称上右键新建一个频道</p></div>
+                    }
+                </ChildContent>
+            </Dropdown>
+        }
     }
-    <div class="room-sidebar-channels mud-elevation-2">
+    <Dropdown Trigger="new Trigger[] { Trigger.ContextMenu }" Placement="Placement.BottomRight" Class="room-sidebar-channels mud-elevation-2" BoundaryAdjustMode="TriggerBoundaryAdjustMode.InScroll">
+        <Overlay>
+            <Menu>
+                <MenuItem>属性</MenuItem>
+                @if (HasInvitePermission || IsOwned)
+                {
+                    <MenuItem>创建邀请链接</MenuItem>
+                }
+            </Menu>
+        </Overlay>
+        <ChildContent>
+            @foreach (var c in ChannelsMap)
+            {
+                if (!c.Key.IsDeleted)
+                {
 
-    </div>
+                }
+            }
+        </ChildContent>
+    </Dropdown>
 
     <div class="room-sidebar-voice mud-theme-secondary" style="display: none;">
         <div class="room-sidebar-voice-voiceInfoIco mud-theme-secondary">
@@ -46,10 +104,14 @@
         <span class="room-sidebar-profile-avatar">
             <MudAvatar Size="Size.Medium"></MudAvatar>
         </span>
-        <div class="room-sidebar-profile-info">
-            <div class="fs-7 room-sidebar-profile-info-name fw-bold">@UserName</div>
-            <div class="room-sidebar-profile-info-id">@userId</div>
-        </div>
+        @{
+            StringBuilder UserId = new();
+            UserId.Append("# ").Append(@userId);
+            <div class="room-sidebar-profile-info">
+                <div class="fs-7 room-sidebar-profile-info-name fw-bold">@UserName</div>
+                <div class="room-sidebar-profile-info-id">@userId</div>
+            </div>
+        }
         <div class="room-sidebar-profile-icons">
             <span class="room-sidebar-profile-icons-mic">
                 <MudIcon Icon="@Icons.Filled.Mic" Size="Size.Medium"></MudIcon>
@@ -64,34 +126,49 @@
     </div>
 </div>
 
-<ContextMenu  Id="room-siderbar-groupname-menu" Template="ContextMenuTemplate" CssClass="mud-theme-primary">
-    <MudItem>Test</MudItem>
-</ContextMenu>
+<CreateCategory
+    Visible="@D_Para.CreateCategoryVisible"
+    HandleCancel="@D_Para.HandleCancel"
+    HandleOk="name => {DoCreateCategory(name);}"
+/>
 
 @code {
-    [ParameterAttribute]
-    public string userId { get; set; }
-    [ParameterAttribute]
-    public Group group { get; set; }
-    [ParameterAttribute]
-    public string UserName { get; set; }
-    public IList<Channel> currectChannels { get; set; }
-
-    protected override async Task OnInitializedAsync()
+    class DialogPara
     {
-        if (group is not null)
+        public bool CreateCategoryVisible { get; set; } = false;
+        public bool IsRenameGroupDialogVisible { get; set; } = false;
+        public void HandleCancel()
         {
-            currectChannels = await gps.GetChannelFromGroupAsync("RoomSideBar: Getting Channels.", group.Id);
+            CreateCategoryVisible = false;
+            IsRenameGroupDialogVisible = false;
         }
     }
 
-    private void HandleRightClick_GroupNameBar()
+    DialogPara D_Para = new();
+    [ParameterAttribute]
+    public KeyValuePair<Group,bool> CurrectGroup { get; set; }
+    [ParameterAttribute]
+    public string userId { get; set; }
+    [ParameterAttribute]
+    public string UserName { get; set; }
+    [ParameterAttribute]
+    public Dictionary<ChannelCategory, IList<Channel>> ChannelsMap { get; set; } = new();
+    [ParameterAttribute]
+    public bool HasInvitePermission { get; set; } = false;
+    [ParameterAttribute]
+    public bool IsOwned { get; set; } = false;
+
+    public async Task DoCreateCategory(string name)
     {
-
-    }
-
-    private void HandleMouseUp_GroupNameBar()
-    {
-
+        try
+        {
+            await Cm.CreateCategory(name, userId, CurrectGroup.Key.Id);
+            Snackbar.Add("成功创建该类别", Severity.Success);
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add("无法创建该类别", Severity.Error);
+        }
+        D_Para.CreateCategoryVisible = false;
     }
 }

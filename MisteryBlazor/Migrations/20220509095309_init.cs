@@ -50,6 +50,22 @@ namespace MisteryBlazor.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ChannelCategories",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GroupId = table.Column<int>(type: "int", nullable: false),
+                    CategoryName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    Created = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ChannelCategories", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ChannelMessages",
                 columns: table => new
                 {
@@ -71,8 +87,8 @@ namespace MisteryBlazor.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ChannelName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    CategoryId = table.Column<int>(type: "int", maxLength: 100, nullable: false),
+                    ChannelName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    CategoryId = table.Column<int>(type: "int", maxLength: 200, nullable: false),
                     GroupId = table.Column<int>(type: "int", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     IsPrivate = table.Column<bool>(type: "bit", nullable: false),
@@ -155,7 +171,7 @@ namespace MisteryBlazor.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    GroupName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    GroupName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     GroupOwnerId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreationTime = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
@@ -387,6 +403,9 @@ namespace MisteryBlazor.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "ChannelCategories");
 
             migrationBuilder.DropTable(
                 name: "ChannelMessages");

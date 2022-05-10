@@ -1,13 +1,63 @@
-﻿<div class="room-sidebar-channel">
-    <span class="room-sidebar-channel-icon">
-        <MudIcon Size="Size.Small" Icon="@Icons.Outlined.Circle" style="width: 15px; height: 15px;"/>
-    </span>
-    <div class="room-sidebar-channel-text-name">
-        Test
-    </div>
+﻿@using MisteryBlazor.Data.GroupsModel
+<div id="@Id" class="room-sidebar-channel">
+    <Dropdown Trigger="new Trigger[] { Trigger.ContextMenu }" Placement="AntDesign.Placement.BottomRight">
+        <Overlay>
+            <Menu>
+                @if (HasRenamePermission || IsOwned)
+                {
+                    <MenuItem OnClick="() => { D_Para.IsRenameChannelDialogVisible = true; }">修改名称</MenuItem>
+                }
+                <MenuItem>属性</MenuItem>
+                @if (HasInvitePermission || IsOwned)
+                {
+                    <MenuItem>创建邀请链接</MenuItem>
+                }
+                <MenuDivider/>
+                @if (IsOwned)
+                {
+                    <MenuItem OnClick="() => { D_Para.IsDeleteDialogVisible = true; }">删除</MenuItem>
+                }
+            </Menu>
+        </Overlay>
+        <ChildContent>
+            <span class="room-sidebar-channel-icon">
+                <MudIcon Size="Size.Small" Icon="@Icons.Outlined.Circle" style="width: 15px; height: 15px;"/>
+            </span>
+            <div class="room-sidebar-channel-text-name">
+                @channel.ChannelName
+            </div>
+        </ChildContent>
+    </Dropdown>
 </div>
 
 @code {
-    [Parameter]
-    public int gid { get; set; }
+    class DialogPara
+    {
+        public bool IsDeleteDialogVisible { get; set; } = false;
+        public bool IsRenameChannelDialogVisible { get; set; } = false;
+        public void HandleCancel()
+        {
+            IsDeleteDialogVisible = false;
+            IsRenameChannelDialogVisible = false;
+        }
+    }
+    [ParameterAttribute]
+    public int Id { get; set; }
+    [ParameterAttribute]
+    public Channel channel { get; set; }
+    DialogPara D_Para = new();
+    [ParameterAttribute]
+    public Action OnClick { get; set; }
+    [ParameterAttribute]
+    public string avatarUri { get; set; }
+    [ParameterAttribute]
+    public EventCallback HandleDelete { get; set; }
+    [ParameterAttribute]
+    public EventCallback<string> HandleRename { get; set; }
+    [ParameterAttribute]
+    public bool IsOwned { get; set; }
+    [ParameterAttribute]
+    public bool HasRenamePermission { get; set; } = false;
+    [ParameterAttribute]
+    public bool HasInvitePermission { get; set; } = false;
 }

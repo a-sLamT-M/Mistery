@@ -168,13 +168,13 @@ namespace MisteryBlazor.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<int>("CategoryId")
-                        .HasMaxLength(100)
+                        .HasMaxLength(200)
                         .HasColumnType("int");
 
                     b.Property<string>("ChannelName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<byte[]>("CreationTime")
                         .IsConcurrencyToken()
@@ -222,7 +222,7 @@ namespace MisteryBlazor.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CategoryCategories");
+                    b.ToTable("ChannelCategories");
                 });
 
             modelBuilder.Entity("MisteryBlazor.Data.GroupsModel.Group", b =>
@@ -241,8 +241,8 @@ namespace MisteryBlazor.Migrations
 
                     b.Property<string>("GroupName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("GroupOwnerId")
                         .IsRequired()

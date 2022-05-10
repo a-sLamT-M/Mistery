@@ -12,7 +12,7 @@ using MisteryBlazor.Data.Context;
 namespace MisteryBlazor.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220507074845_init")]
+    [Migration("20220509095309_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -170,13 +170,13 @@ namespace MisteryBlazor.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<int>("CategoryId")
-                        .HasMaxLength(100)
+                        .HasMaxLength(200)
                         .HasColumnType("int");
 
                     b.Property<string>("ChannelName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<byte[]>("CreationTime")
                         .IsConcurrencyToken()
@@ -198,6 +198,35 @@ namespace MisteryBlazor.Migrations
                     b.ToTable("Channels");
                 });
 
+            modelBuilder.Entity("MisteryBlazor.Data.GroupsModel.ChannelCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("Created")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ChannelCategories");
+                });
+
             modelBuilder.Entity("MisteryBlazor.Data.GroupsModel.Group", b =>
                 {
                     b.Property<int>("Id")
@@ -214,8 +243,8 @@ namespace MisteryBlazor.Migrations
 
                     b.Property<string>("GroupName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("GroupOwnerId")
                         .IsRequired()

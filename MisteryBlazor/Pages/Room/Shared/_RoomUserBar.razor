@@ -13,6 +13,8 @@
 @inject NavigationManager uriHelper;
 @inject GroupsManager Gm;
 @inject IJSRuntime JS;
+@inject ISnackbar Snackbar;
+@inject ChannelsManager Cm;
 
 @if (groups is null)
 {
@@ -38,12 +40,15 @@ else
                         <div class="room-userbar-groups-func">
                             @foreach (var group in comparedGroups)
                             {
+                                if(group.Key.IsDeleted) continue;
                                 sb.Append("room-groupcom-").Append(group.Key.Id.ToString());
                                 <_RoomUserBarGroup
                                     groupName=@group.Key.GroupName.ToStringFromASCIIByte()
-                                    OnClick="() => { GroupCompOnClick(group.Key.Id); }" Id="@sb.ToString()"
+                                    OnClick="() => { GroupCompOnClick(group.Key.Id); }" 
+                                    Id="@sb.ToString()"
                                     IsOwned="group.Value"
-                                    HandleDelete="() => { Gm.DeleteGroup(userId, group.Key.Id); }"
+                                    HandleDelete="() => { HandleDelete(group.Key.Id); }"
+                                    HandleRename=" name => { HandleRename(userId, group.Key.Id, name);}"
                                 />
                                 sb.Clear();
                             }
@@ -74,7 +79,7 @@ else
     [ParameterAttribute]
     public IList<Group> groups { get; set; }
     [ParameterAttribute]
-    public Dictionary<Group, bool> comparedGroups { get; set; }
+    public Dictionary<Group, bool> comparedGroups { get; set; } // bool: if owned
     [ParameterAttribute]
     public int currectGroup { get; set; } = 0;
     [ParameterAttribute]
@@ -83,9 +88,6 @@ else
     public EventCallback<int> OnCurrectGroupChanged { get; set; }
     [ParameterAttribute]
     public EventCallback<IList<Group>> OnGroupAdded { get; set; }
-    [ParameterAttribute]
-    public EventCallback HandleDelete { get; set; }
-
     private async Task OpenAddGroupDialog()
     {
         var para = new DialogParameters();
@@ -101,7 +103,7 @@ else
         var result = await dialog.Result;
         if (!result.Cancelled)
         {
-            groups = await gps.GetGroupsFromUserAsync("RoomUserBar: Getting Groups.", userId);
+            groups = await gps.GetGroupsFromUserAsync("RoomUserBar: Getting Groups.", userId)!;
             await OnGroupAdded.InvokeAsync(groups);
         }
     }
@@ -110,6 +112,7 @@ else
     {
         StringBuilder sb = new();
         currectGroup = id;
+
         if (lastGroup == 0)
         {
             lastGroup = id;
@@ -126,5 +129,36 @@ else
         await JS.InvokeVoidAsync("ChangeClass", sb.ToString(),"room-userbargroup-onclick");
         sb.Clear();
         await OnCurrectGroupChanged.InvokeAsync(currectGroup);
+    }
+
+    private async Task HandleDelete(int id)
+    {
+        try
+        {
+            await Gm.DeleteGroup(userId, id);
+            Snackbar.Add("成功解散该群组", Severity.Success);
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add("无法解散该群组", Severity.Error);
+        }
+    }
+
+    private async Task HandleRename(string uid, int gid, string name)
+    {
+        try
+        {
+            await Gm.UpdateGroupName(gid, uid, name);
+            Snackbar.Add("成功命名该群组", Severity.Success);
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add("无法命名该群组", Severity.Error);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Gm.GroupNameUpdatedEvent += GroupCompOnClick;
     }
 }

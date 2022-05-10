@@ -34,7 +34,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<MisteryIdentityUser>>();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services
-    .AddScoped<GroupsManager>()
+    .AddScoped<GroupsManager>().AddScoped<ChannelsManager>()
     .AddScoped<UserDataService>().AddScoped<AuthorizationManager>()
     .AddScoped<GroupDataService>().AddAntDesign();
 

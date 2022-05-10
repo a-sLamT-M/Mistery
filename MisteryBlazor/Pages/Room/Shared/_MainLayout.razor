@@ -11,6 +11,7 @@
 @inject IJSRuntime js;
 @inject GroupsManager Gm;
 @inject AuthorizationManager Am;
+@inject ChannelsManager Cm;
 
 <head>
     <link href="BlazorMaterialUI.styles.css" rel="stylesheet" />
@@ -33,11 +34,14 @@
             userId=@Am.UserId 
             groups="@Gm.Groups"
             comparedGroups="@Gm.GroupsDictionary"
-            />
+        />
         @{
-            StringBuilder UserId = new();
-            UserId.Append("# ").Append(@Am.UserId);
-            <_RoomSideBar group=@Gm.SelectedGroup UserName=@Am.UserName userId=@UserId.ToString()/>
+            <_RoomSideBar
+                UserName=@Am.UserName 
+                userId=@Am.UserId
+                CurrectGroup="@Gm.SelectedGroup"
+                ChannelsMap="@Cm.ChannelsDictionary"
+                IsOwned="@Gm.SelectedGroup.Value"/>
         }
     </div>
     <main class="room-page-MainLayout-HeaderBar">
@@ -51,8 +55,9 @@
     private bool _isDarkMode = true;
     protected override async Task OnInitializedAsync()
     {
-        Gm.InitAsync();
-        Am.InitAsync();
+        await Am.InitAsync();
+        await Gm.InitAsync();
+        await Cm.InitAsync();
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -65,7 +70,6 @@
     {
         Palette = new Palette()
         {
-
             Primary = Colors.Green.Default,
             Secondary = Colors.Green.Default,
             Tertiary = Colors.Green.Default,
@@ -77,10 +81,10 @@
             Dark = Colors.Shades.White,
             GrayDark = Colors.Shades.White,
             Secondary = Colors.Grey.Darken4, 
-            Primary = (MudColor) "#262829",
+            Primary = (MudColor) "#1F1F1F",
             TextPrimary = Colors.Grey.Lighten4,
-            Tertiary = (MudColor) "#2D2F33",
-            Background = (MudColor) "#262829",
+            Tertiary = (MudColor) "#282828",
+            Background = (MudColor) "#1F1F1F",
             LinesInputs = Colors.Grey.Lighten4,
             LinesDefault = Colors.Grey.Lighten3,
             TextSecondary = Colors.Grey.Darken1,
@@ -88,8 +92,8 @@
             ActionDefault= Colors.Grey.Default,
             ActionDisabled= "#ABABAB",
             PrimaryContrastText = Colors.Grey.Lighten3,
-            BackgroundGrey = "#262829",
-            Surface = "#2D2F33",
+            BackgroundGrey = "#BBBBBB",
+            Surface = "#1F1F1F",
         },
 
         LayoutProperties = new LayoutProperties()

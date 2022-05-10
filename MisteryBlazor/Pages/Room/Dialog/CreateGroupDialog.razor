@@ -2,14 +2,16 @@
 @using System.Text
 @using Microsoft.Extensions.Logging
 @using MisteryBlazor.Services.DAL
+@using MisteryBlazor.Services.DataManager
+@using MisteryBlazor.StringUtils
 @inject ILogger<CreateGroupDialog> Logger
-@inject GroupDataService gps;
+@inject GroupsManager Gm
 @inject ISnackbar Snackbar
 
 <MudForm>
     <MudDialog Class="mud-theme-primary room-dialog-creategroup mb-3">
         <DialogContent>
-            <MudPaper class="mud-theme-primary">
+            <MudPaper Class="mud-theme-primary">
                 <MudTextField T="string" @bind-Text="@m.GroupName" Label="Group Name" Required="true" RequiredError="Group Name is required!"
                               Validation="(new Func<string, IEnumerable<string>>(Validation))" Variant="Variant.Filled" Margin="Margin.Dense"/>
             </MudPaper>
@@ -58,10 +60,15 @@
 
     private async Task<int> Create()
     {
-        StringBuilder log = new StringBuilder();
-        log.Append("User：").Append(Uid).Append(" ").Append("is creating group ").Append(m.GroupName);
-        var result = gps.CreateNewGroup(log.ToString(),m.GroupName, Uid);
-        return result.Entity.Id;
+        try
+        {
+            return Gm.CreateGroup(Uid, m.GroupName);
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add("Failed to create a group.", Severity.Error);
+        }
+        return 0;
     }
 
     private IEnumerable<string> Validation(string str)
@@ -71,7 +78,7 @@
             yield return "Group Name is required!";
             yield break;
         }
-        if (str.Length >= 89)
+        if (str.ToASCIIByte().Length >= 180)
         {
             yield return "名称过长";
             yield break;

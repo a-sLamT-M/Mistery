@@ -15,9 +15,11 @@ namespace MisteryBlazor.Services.DAL
         private readonly ILogger _logger;
         private List<Group> groups;
         private List<GroupMember> GroupMembers;
+        private List<GroupAvatar> GroupsAvatars;
         private List<ChannelMessage> ChannelMessages;
         private List<Channel> Channels;
-        private List<GroupAvatar> GroupsAvatars;
+        private List<ChannelCategory> ChannelCategorys;
+
         public GroupDataService(AppDbContext context, ILogger<GroupDataService> logger)
         {
             _context = context;
@@ -28,6 +30,7 @@ namespace MisteryBlazor.Services.DAL
             GroupMembers = _context.GroupMembers.ToList();
             Channels = _context.Channels.ToList();
             GroupsAvatars = _context.GroupAvatars.ToList();
+            ChannelCategorys = _context.ChannelCategories.ToList();
         }
 
         public List<Group> GetAllGroups(string log)
@@ -50,7 +53,6 @@ namespace MisteryBlazor.Services.DAL
         }
         public List<GroupMember> GetAllGroupsMember(string log, int gid)
         {
-
             var groupsMember =
                 from gp in GroupMembers where gp.GroupId == gid select gp;
             _logger.LogInformation(string.Empty, log);
@@ -84,6 +86,10 @@ namespace MisteryBlazor.Services.DAL
             }
             return groupsWithBools;
         }
+        public KeyValuePair<Group,bool> CompareIfGroupIsOnwedByUser(string log, string uid, Group group)
+        {
+            return new KeyValuePair<Group, bool>(@group, @group.GroupOwnerId == uid);
+        }
         public Dictionary<Group, bool> CompareIfGroupsIsOnwedByUser(string log, string uid,
             IList<Group> groups)
         {
@@ -110,34 +116,7 @@ namespace MisteryBlazor.Services.DAL
             _logger.LogInformation(string.Empty, log);
             return groupsSelected.ToList();
         }
-        public List<Channel>? GetChannelFromGroup(string log, int gid)
-        {
-            try
-            {
-                var channelSelected = Channels.Where(m => m.GroupId == gid);
-                _logger.LogInformation(string.Empty, log);
-                return channelSelected.ToList();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e.Message);
-                return new List<Channel>();
-            }
-        }
-        public async Task<List<Channel>>? GetChannelFromGroupAsync(string log, int gid)
-        {
-            try
-            {
-                var channelSelected = Channels.Where(m => m.GroupId == gid);
-                _logger.LogInformation(string.Empty, log);
-                return channelSelected.ToList();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e.Message);
-                return new List<Channel>();
-            }
-        }
+
         public Group GetGroupById(string log, int gid)
         {
             return groups.Find(g => g.Id == gid);
@@ -150,16 +129,6 @@ namespace MisteryBlazor.Services.DAL
         {
             _logger.LogInformation(string.Empty, log);
             return GroupMembers;
-        }
-        public List<ChannelMessage> GetAllMessages(string log)
-        {
-            _logger.LogInformation(string.Empty, log);
-            return ChannelMessages;
-        }
-        public List<Channel> GetAllChannels(string log)
-        {
-            _logger.LogInformation(string.Empty, log);
-            return Channels;
         }
         public EntityEntry<Group> CreateNewGroup(string log, string groupName, string createrId)
         {
@@ -214,6 +183,178 @@ namespace MisteryBlazor.Services.DAL
             groups = _context.Groups.ToList();
             GroupMembers = _context.GroupMembers.ToList();
             return newGroup;
+        }
+
+        public async Task SetGroupDeleted(string log, int gid, string uid)
+        {
+            if (!GroupMemberVerification("UpdatingName: Verification working.", gid, uid))
+            {
+                throw new Exception("Unable to Set Delete: Currect user is not the group owner");
+            }
+
+            var needUpdate = _context.Groups.Single(g => g.Id == gid);
+            if (!needUpdate.IsDeleted)
+            {
+                needUpdate.IsDeleted = true;
+                await _context.SaveChangesAsync();
+            }
+        }
+        public async Task UpdateGroupName(string log, int gid, string uid, string newName)
+        {
+            if (newName.ToASCIIByte().Length >= 180 || newName.Length == 0) throw new Exception("Group name.length >=180");
+                if (!GroupMemberVerification("UpdatingName: Verification working.", gid, uid)) return;
+            var needUpdate = _context.Groups.Single(g => g.Id == gid);
+            needUpdate.GroupName = newName.ToASCIIByte();
+            await _context.SaveChangesAsync();
+        }
+        public bool IsUserOwnedGroup(string log, int gid, string uid)
+        {
+            return groups.Single(g => g.Id == gid).GroupOwnerId == uid;
+        }
+        public List<ChannelMessage> GetAllMessages(string log)
+        {
+            _logger.LogInformation(string.Empty, log);
+            return ChannelMessages;
+        }
+        public List<Channel> GetAllChannels(string log)
+        {
+            _logger.LogInformation(string.Empty, log);
+            return Channels;
+        }
+
+        public List<ChannelCategory> GetAllChannelCategories(string log)
+        {
+            _logger.LogInformation(string.Empty, log);
+            return ChannelCategorys;
+        }
+        public List<Channel>? GetChannelFromGroup(string log, int gid)
+        {
+            try
+            {
+                var channelSelected = Channels.Where(m => m.GroupId == gid);
+                _logger.LogInformation(string.Empty, log);
+                return channelSelected.ToList();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return new List<Channel>();
+            }
+        }
+        public async Task<List<Channel>>? GetChannelFromGroupAsync(string log, int gid)
+        {
+            try
+            {
+                var channelSelected = Channels.Where(m => m.GroupId == gid);
+                _logger.LogInformation(string.Empty, log);
+                return channelSelected.ToList();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return new List<Channel>();
+            }
+        }
+        public async Task<List<ChannelCategory>>? GetChannelCatagoryFromGroupAsync(string log, int gid)
+        {
+            try
+            {
+                var channelSelected = ChannelCategorys.Where(m => m.GroupId == gid);
+                _logger.LogInformation(string.Empty, log);
+                return channelSelected.ToList();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return new List<ChannelCategory>();
+            }
+        }
+
+        public async Task<Dictionary<ChannelCategory, IList<Channel>>> GetChannelWithCatagoryFromGroupAsync(string log,
+            int gid)
+        {
+            _logger.LogInformation(log);
+            Dictionary<ChannelCategory, IList<Channel>> result = new();
+            var channels = await GetChannelFromGroupAsync("Loading channels to check category.", gid);
+            var categories = await GetChannelCatagoryFromGroupAsync("Loading categories to check category.", gid);
+            foreach (var category in categories)
+            {
+                if (!result.ContainsKey(category))
+                {
+                    result.Add(category,new List<Channel>());
+                }
+            }
+
+            var keyIds = result.Keys.Select(x => x.Id);
+            foreach (var channel in channels)
+            {
+                if (keyIds.Contains(channel.CategoryId))
+                {
+                    result[result.Keys.Single(x=>x.Id == channel.CategoryId)].Add(channel);
+                }
+            }
+
+            if (result.Count > 0)
+            {
+                return result;
+            }
+            else
+            {
+                return new();
+            }
+        }
+
+        public async Task<EntityEntry<ChannelCategory>> CreateCategoryAsync(string log, string uid, int gid, string name)
+        {
+            _logger.LogInformation(string.Empty,log);
+            if (name.ToASCIIByte().Length >= 180 || name.Length == 0) throw new Exception("Group name.length >=180");
+            if (!GroupMemberVerification("UpdatingName: Verification working.", gid, uid)) return null;
+            var result =  await _context.ChannelCategories.AddAsync(new ChannelCategory()
+            {
+                GroupId=gid,
+                CategoryName = name.ToASCIIByte()
+            });
+            await _context.SaveChangesAsync();
+            return result;
+        }
+        public EntityEntry<ChannelCategory> CreateCategory(string log, string uid, int gid, string name)
+        {
+            _logger.LogInformation(string.Empty, log);
+            if (name.ToASCIIByte().Length >= 180 || name.Length == 0) throw new Exception("Group name.length >=180");
+            if (!GroupMemberVerification("UpdatingName: Verification working.", gid, uid))
+                throw new Exception("User not owned this group.");
+            var result =  _context.ChannelCategories.Add(new ChannelCategory()
+            {
+                GroupId = gid,
+                CategoryName = name.ToASCIIByte()
+            });
+            _context.SaveChanges();
+            return result;
+        }
+        public async Task SetCategoryDeleted(string log, int cid, string uid)
+        {
+            if (!GroupMemberVerification("UpdatingName: Verification working.", cid, uid))
+            {
+                throw new Exception("Unable to Set Delete: Currect user is not the group owner");
+            }
+            var needUpdate = _context.ChannelCategories.Single(g => g.Id == cid);
+            if (!needUpdate.IsDeleted)
+            {
+                needUpdate.IsDeleted = true;
+                await _context.SaveChangesAsync();
+            }
+        }
+        public async Task UpdateCategoryName(string log, int cid, string uid, string newName)
+        {
+            if (newName.ToASCIIByte().Length >= 180 || newName.Length == 0) throw new Exception("Group name.length >=180");
+            if (!GroupMemberVerification("UpdatingName: Verification working.", cid, uid)) return;
+            var needUpdate = _context.ChannelCategories.Single(g => g.Id == cid);
+            needUpdate.CategoryName = newName.ToASCIIByte();
+            await _context.SaveChangesAsync();
+        }
+        public bool GroupMemberVerification(string log, int gid, string uid)
+        {
+            return IsUserOwnedGroup(log, gid, uid);
         }
     }
 }

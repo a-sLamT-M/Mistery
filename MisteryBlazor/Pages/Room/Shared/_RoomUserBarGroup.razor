@@ -6,41 +6,72 @@
     <Dropdown Trigger="new Trigger[] { Trigger.ContextMenu }" Placement="Placement.BottomRight">
         <Overlay>
             <Menu>
-                <MenuItem >修改名称</MenuItem>
-                    <MenuItem>属性</MenuItem>
+                @if (HasRenamePermission || IsOwned)
+                {
+                    <MenuItem OnClick="() => { D_Para.IsRenameGroupDialogVisible = true; }">修改名称</MenuItem>
+                }
+                <MenuItem>属性</MenuItem>
+                @if (HasInvitePermission || IsOwned)
+                {
                     <MenuItem>创建邀请链接</MenuItem>
-                    <MenuDivider/>
-                    @if (IsOwned)
-                    {
-                        <MenuItem OnClick="() => { D_Para.IsDeleteDialogVisible = true;}">解散</MenuItem>
-                        <MenuItem>转让</MenuItem>
-                    }
-                    else
-                    {
-                        <MenuItem>退出</MenuItem>
-                    }
+                }
+                <MenuDivider/>
+                @if (IsOwned)
+                {
+                    <MenuItem OnClick="() => { D_Para.IsDeleteDialogVisible = true; }">解散</MenuItem>
+                    <MenuItem>转让</MenuItem>
+                }
+                else
+                {
+                    <MenuItem>退出</MenuItem>
+                }
             </Menu>
         </Overlay>
         <ChildContent>
             <MudIconButton Style="height: 50px; width: 50px;" class="rounded-circle" Size="Size.Large" OnClick="OnClick.Invoke">
                 <span class="room-userbargroup-avatar">
-                    <MudAvatar Style="height: 50px; width: 50px;">@groupName[0]</MudAvatar>
+                    @if(groupName.Length > 0)
+                    { 
+                        <MudAvatar Style="height: 50px; width: 50px;">
+                            @groupName[0]
+                        </MudAvatar>
+                    }
+                    else
+                    {
+                        <MudAvatar Style="height: 50px; width: 50px;">
+                            ?
+                        </MudAvatar>
+                    }
                 </span>
             </MudIconButton>
         </ChildContent>
     </Dropdown>
 </div>
 
-<DeleteGroup Visible="@D_Para.IsDeleteDialogVisible" HandleCancel="D_Para.HandleCancel" HandleOk="HandleDelete"/>
+<DeleteGroup 
+    Visible="@D_Para.IsDeleteDialogVisible" 
+    HandleCancel="D_Para.HandleCancel"
+    HandleOk="Delete"
+    Context="@groupName"
+/>
+    
+<RenameGroupDialog
+    Visible="@D_Para.IsRenameGroupDialogVisible" 
+    HandleCancel="D_Para.HandleCancel"
+    HandleOk="async name => {await Rename(name);}"
+    Name="@groupName"
+/>
 
 @code {
     class DialogPara
     {
         public bool IsDeleteDialogVisible { get; set; } = false;
+        public bool IsRenameGroupDialogVisible { get; set; } = false;
 
         public void HandleCancel()
         {
             IsDeleteDialogVisible = false;
+            IsRenameGroupDialogVisible = false;
         }
     }
 
@@ -50,8 +81,6 @@
     [ParameterAttribute]
     public int gid { get; set; }
     [ParameterAttribute]
-    public string avatarName { get; set; } = String.Empty;
-    [ParameterAttribute]
     public Action OnClick { get; set; }
     [ParameterAttribute] 
     public string Id { get; set; }
@@ -60,10 +89,23 @@
     [ParameterAttribute]
     public EventCallback HandleDelete { get; set; }
     [ParameterAttribute]
+    public EventCallback<string> HandleRename { get; set; }
+    [ParameterAttribute]
     public bool IsOwned { get; set; }
+    [ParameterAttribute]
+    public bool HasRenamePermission { get; set; } = false;
+    [ParameterAttribute]
+    public bool HasInvitePermission { get; set; } = false;
 
-    private void OnGroupClicked()
+    private async Task Delete()
     {
-        OnClick.Invoke();
+        await HandleDelete.InvokeAsync();
+        D_Para.IsDeleteDialogVisible = false;
+    }
+
+    private async Task Rename(string name)
+    {
+        await HandleRename.InvokeAsync(name);
+        D_Para.IsRenameGroupDialogVisible = false;
     }
 }
