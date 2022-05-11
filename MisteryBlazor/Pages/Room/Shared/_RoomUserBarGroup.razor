@@ -10,14 +10,16 @@
                 {
                     <MenuItem OnClick="() => { D_Para.IsRenameGroupDialogVisible = true; }">修改名称</MenuItem>
                 }
-                <MenuItem>属性</MenuItem>
+
                 @if (HasInvitePermission || IsOwned)
                 {
                     <MenuItem>创建邀请链接</MenuItem>
+                    <MenuDivider/>
                 }
-                <MenuDivider/>
+                <MenuItem>群属性</MenuItem>
                 @if (IsOwned)
                 {
+                    <MenuDivider/>
                     <MenuItem OnClick="() => { D_Para.IsDeleteDialogVisible = true; }">解散</MenuItem>
                     <MenuItem>转让</MenuItem>
                 }
@@ -28,7 +30,7 @@
             </Menu>
         </Overlay>
         <ChildContent>
-            <MudIconButton Style="height: 50px; width: 50px;" class="rounded-circle" Size="Size.Large" OnClick="OnClick.Invoke">
+            <MudIconButton Style="height: 50px; width: 50px;" class="rounded-circle" Size="Size.Large" OnClick="OnClick">
                 <span class="room-userbargroup-avatar">
                     @if(groupName.Length > 0)
                     { 
@@ -81,7 +83,7 @@
     [ParameterAttribute]
     public int gid { get; set; }
     [ParameterAttribute]
-    public Action OnClick { get; set; }
+    public EventCallback OnClick { get; set; }
     [ParameterAttribute] 
     public string Id { get; set; }
     [ParameterAttribute]

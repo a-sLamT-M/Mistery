@@ -10,6 +10,7 @@ using MisteryBlazor.Data.User;
 using MisteryBlazor.Services;
 using MisteryBlazor.Services.DAL;
 using MisteryBlazor.Services.DataManager;
+using MisteryBlazor.Services.Events;
 using MudBlazor;
 using MudBlazor.Services;
 using Animation = BlazorContextMenu.Animation;
@@ -33,9 +34,12 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<MisteryIdentityUser>>();
 builder.Services.AddSingleton<WeatherForecastService>();
-builder.Services
-    .AddScoped<GroupsManager>().AddScoped<ChannelsManager>()
-    .AddScoped<UserDataService>().AddScoped<AuthorizationManager>()
+builder.Services.AddScoped<GroupsManager>()
+    .AddScoped<GroupManagerEvents>()
+    .AddScoped<ChannelsManager>()
+    .AddScoped<ChannelManagerEvents>()
+    .AddScoped<UserDataService>()
+    .AddScoped<AuthorizationManager>()
     .AddScoped<GroupDataService>().AddAntDesign();
 
 builder.Services.AddAuthorization(options =>

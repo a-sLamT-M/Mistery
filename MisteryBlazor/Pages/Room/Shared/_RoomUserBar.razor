@@ -6,15 +6,18 @@
 @using System.Text
 @using MisteryBlazor.Pages.Room.Dialog
 @using MisteryBlazor.Services.DataManager
+@using MisteryBlazor.Services.Events
 @using MisteryBlazor.StringUtils
 @using static System.Linq.Enumerable
 @inject GroupDataService gps;
-@inject IDialogService DialogService;
+@inject ChannelsManager Cm;
 @inject NavigationManager uriHelper;
 @inject GroupsManager Gm;
+@inject GroupManagerEvents Gme;
 @inject IJSRuntime JS;
 @inject ISnackbar Snackbar;
-@inject ChannelsManager Cm;
+@inject IDialogService DialogService;
+
 
 @if (groups is null)
 {
@@ -44,11 +47,11 @@ else
                                 sb.Append("room-groupcom-").Append(group.Key.Id.ToString());
                                 <_RoomUserBarGroup
                                     groupName=@group.Key.GroupName.ToStringFromASCIIByte()
-                                    OnClick="() => { GroupCompOnClick(group.Key.Id); }" 
+                                    OnClick="async () => { await GroupCompOnClick(group.Key.Id); }" 
                                     Id="@sb.ToString()"
                                     IsOwned="group.Value"
-                                    HandleDelete="() => { HandleDelete(group.Key.Id); }"
-                                    HandleRename=" name => { HandleRename(userId, group.Key.Id, name);}"
+                                    HandleDelete="async () => { await HandleDelete(group.Key.Id); }"
+                                    HandleRename="async name => { await HandleRename(userId, group.Key.Id, name);}"
                                 />
                                 sb.Clear();
                             }
@@ -86,8 +89,6 @@ else
     public int lastGroup { get; set; } = 0;
     [ParameterAttribute]
     public EventCallback<int> OnCurrectGroupChanged { get; set; }
-    [ParameterAttribute]
-    public EventCallback<IList<Group>> OnGroupAdded { get; set; }
     private async Task OpenAddGroupDialog()
     {
         var para = new DialogParameters();
@@ -101,13 +102,12 @@ else
         };
         var dialog = DialogService.Show<CreateGroupDialog>("Create a group", para, options);
         var result = await dialog.Result;
-        if (!result.Cancelled)
-        {
-            groups = await gps.GetGroupsFromUserAsync("RoomUserBar: Getting Groups.", userId)!;
-            await OnGroupAdded.InvokeAsync(groups);
-        }
     }
-
+    private void OnGroupAdded(Dictionary<Group, bool> groupsmap, IList<Group> group)
+    {
+        groups = group;
+        comparedGroups = groupsmap;
+    }
     private async Task GroupCompOnClick(int id)
     {
         StringBuilder sb = new();
@@ -159,6 +159,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        Gm.GroupNameUpdatedEvent += GroupCompOnClick;
+        Gme.GroupNameUpdatedEvent += GroupCompOnClick;
+        Gme.GroupAddedEvent += OnGroupAdded;
     }
 }

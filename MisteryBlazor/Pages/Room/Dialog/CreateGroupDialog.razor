@@ -62,7 +62,7 @@
     {
         try
         {
-            return Gm.CreateGroup(Uid, m.GroupName);
+            return await Gm.Create(Uid, m.GroupName);
         }
         catch (Exception e)
         {

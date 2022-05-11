@@ -5,6 +5,7 @@
 @using MisteryBlazor.Services
 @using MisteryBlazor.Services.DAL
 @using MisteryBlazor.Services.DataManager
+@using MisteryBlazor.Services.Events
 @using MisteryBlazor.StringUtils
 @inherits LayoutComponentBase
 @inject GroupDataService gps;
@@ -12,6 +13,7 @@
 @inject GroupsManager Gm;
 @inject AuthorizationManager Am;
 @inject ChannelsManager Cm;
+@inject GroupManagerEvents Gme;
 
 <head>
     <link href="BlazorMaterialUI.styles.css" rel="stylesheet" />
@@ -28,9 +30,8 @@
 <PageTitle>MisteryBlazor</PageTitle>
 <div class="room-page-MainLayout">
     <div class="room-mainlayout-sidebar">
-        <_RoomUserBar 
-            OnGroupAdded="() => Gm.InitAsync()" 
-            OnCurrectGroupChanged="gid => {Gm.SelectedGroupId=gid;}" 
+        <_RoomUserBar
+            OnCurrectGroupChanged="async gid => {Gm.SelectedGroupId=gid;}" 
             userId=@Am.UserId 
             groups="@Gm.Groups"
             comparedGroups="@Gm.GroupsDictionary"
@@ -39,7 +40,6 @@
             <_RoomSideBar
                 UserName=@Am.UserName 
                 userId=@Am.UserId
-                CurrectGroup="@Gm.SelectedGroup"
                 ChannelsMap="@Cm.ChannelsDictionary"
                 IsOwned="@Gm.SelectedGroup.Value"/>
         }
@@ -93,7 +93,7 @@
             ActionDisabled= "#ABABAB",
             PrimaryContrastText = Colors.Grey.Lighten3,
             BackgroundGrey = "#BBBBBB",
-            Surface = "#1F1F1F",
+            Surface = "#242424",
         },
 
         LayoutProperties = new LayoutProperties()

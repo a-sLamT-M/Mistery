@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using MisteryBlazor.Data.GroupsModel;
 using MisteryBlazor.Services.DAL;
+using MisteryBlazor.Services.Events;
 using MisteryBlazor.StringUtils;
 
 namespace MisteryBlazor.Services.DataManager
@@ -15,6 +16,14 @@ namespace MisteryBlazor.Services.DataManager
         private GroupDataService _Gps;
         private AuthorizationManager _Am;
         private int selectGroupId = 0;
+        private KeyValuePair<Group,bool> selectedGroup;
+        private Dictionary<Group, bool> groupsDictionary;
+        private IList<Group> groups;
+        private GroupManagerEvents _Gme;
+
+        public KeyValuePair<Group, bool> SelectedGroup => selectedGroup;
+        public IList<Group> Groups => groups;
+        public Dictionary<Group, bool> GroupsDictionary => groupsDictionary;
         public int SelectedGroupId
         {
             set
@@ -23,24 +32,19 @@ namespace MisteryBlazor.Services.DataManager
                 var g = _Gps.GetGroupById("RoomMain: Getting Group", value);
                 if (g is not null)
                 {
-                    selectedGroup=_Gps.CompareIfGroupIsOnwedByUser("RoomUserBar: Comparing group with uid.", _Am.UserId, g);
+                    selectedGroup = _Gps.CompareIfGroupIsOnwedByUser("RoomUserBar: Comparing group with uid.", _Am.UserId, g);
                 }
+
+                var callback = (async () => await _Gme.SelectedGroupChangedEventCallbackAsync(SelectedGroup));
+                callback.Invoke();
             }
         }
-        private KeyValuePair<Group,bool> selectedGroup;
-        private Dictionary<Group, bool> groupsDictionary;
-        private IList<Group> groups;
-        public delegate Task GroupNameUpdated(int id);
-        public event GroupNameUpdated GroupNameUpdatedEvent;
-
-        public KeyValuePair<Group, bool> SelectedGroup => selectedGroup;
-        public IList<Group> Groups => groups;
-        public Dictionary<Group, bool> GroupsDictionary => groupsDictionary;
-        public GroupsManager(ILogger<GroupsManager> logger, GroupDataService gps, AuthorizationManager am)
+        public GroupsManager(ILogger<GroupsManager> logger, GroupDataService gps, AuthorizationManager am, GroupManagerEvents groupManagerEvents)
         {
             _Logger=logger;
             _Gps = gps;
             _Am = am;
+            _Gme = groupManagerEvents;
             _ = InitAsync();
         }
         public async Task InitAsync()
@@ -49,7 +53,7 @@ namespace MisteryBlazor.Services.DataManager
             groupsDictionary = await _Gps.CompareIfGroupsIsOnwedByUserAsync("RoomUserBar: Comparing groups with uid.", _Am.UserId, Groups);
         }
 
-        public int CreateGroup(string uid, string groupName)
+        public async Task<int> Create(string uid, string groupName)
         {
             if (groupName.ToASCIIByte().Length >= 180)
             {
@@ -58,6 +62,8 @@ namespace MisteryBlazor.Services.DataManager
             StringBuilder log = new StringBuilder();
             log.Append("User：").Append(uid).Append(" ").Append("is creating group ").Append(groupName);
             var result = _Gps.CreateNewGroup(log.ToString(), groupName, uid);
+            await InitAsync();
+            await _Gme.GroupAddedEventCallbackAsync(groupsDictionary, groups);
             return result.Entity.Id;
         }
 
@@ -83,7 +89,7 @@ namespace MisteryBlazor.Services.DataManager
             try
             {
                 SelectedGroupId = gid;
-                GroupNameUpdatedEvent(gid);
+                await _Gme.GroupNameUpdatedEventCallbackAsync(gid);
                 await _Gps.UpdateGroupName(sb.ToString(), gid, uid, newName);
             }
             catch(Exception e)

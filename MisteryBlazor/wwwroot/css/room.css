@@ -19,6 +19,7 @@
     flex-direction: column;
     flex: 1;
     height: 100%;
+    width: 100%;
     background-color: #262829;
 }
 
@@ -36,13 +37,30 @@
 .room-sidebar-top {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    height: auto;
+    width: auto;
+           align-items: center;
     padding: 11px;
+    padding-bottom: -5px;
     color: white;
 }
 
 .room-sidebar-channels {
+    flex: 1 1 auto;
+    padding: 15px;
+    padding-top: 5px;
+}
+.room-sidebar-category {
     flex: 1;
+}
+.room-sidebar-channels-main-context-menu {
+    display: flex;
+    align-items: stretch;
+    flex: 1;
+    background: transparent;
+    color: transparent;
+    flex-shrink: 0;
+    align-items: flex-end;
 }
 
 .room-sidebar-channel-text-name {
@@ -108,7 +126,9 @@
     color: gray;
     cursor: pointer;
 }
-
+.room-sidebar-category-scroll {
+    overflow: scroll;
+}
 .room-sidebar-channel-icon {
     color: white;
     align-items: center;
@@ -341,6 +361,8 @@
 .room-mainlayout-sidebar {
     display: flex;
     flex: 0.22;
+    height: auto;
+    width: auto;
 }
 
 .room-userbar {
@@ -401,11 +423,10 @@
 }
 
 .room-userbar-scroll {
-    padding: 3px;
-    height: 88vh;
+
+    height: 88%;
     overflow: scroll;
 }
-
 .room-userbar-split {
 }
 
