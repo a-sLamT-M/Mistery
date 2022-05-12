@@ -1,7 +1,8 @@
 ﻿@using MisteryBlazor.Services.DataManager
 @using MisteryBlazor.Data.GroupsModel
+@using MisteryBlazor.Marcos
 @using MisteryBlazor.StringUtils
-@inject GroupsManager gm
+@inject GroupsManager Gm
 
 <Modal Title="创建类别"
        Visible="@Visible"
@@ -14,8 +15,6 @@
     [ParameterAttribute] 
     public bool Visible { get; set; } = false;
     [ParameterAttribute]
-    public Group Group { get; set; }
-    [ParameterAttribute]
     public EventCallback HandleCancel { get; set; }
     [ParameterAttribute]
     public EventCallback<string> HandleOk { get; set; }
@@ -27,7 +26,7 @@
             yield return "Group Name is required!";
             yield break;
         }
-        if (str.ToASCIIByte().Length >= 180)
+        if (str.ToASCIIByte().Length >= StringMarco.MAX_STRING_LENGTH)
         {
             yield return "名称过长";
             yield break;

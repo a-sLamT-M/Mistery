@@ -1,0 +1,39 @@
+﻿@using MisteryBlazor.Services.DataManager
+@using MisteryBlazor.Data.GroupsModel
+@using MisteryBlazor.Marcos
+@using MisteryBlazor.StringUtils
+@inject GroupsManager Gm
+
+<Modal Title="创建频道"
+       Visible="@Visible"
+       OnOk="()=>HandleOk.InvokeAsync(Name)"
+       OnCancel="@HandleCancel">
+    <Input Placeholder="频道名称" @bind-Value="@Name" AutoFocus="true" DefaultValue="@Name"/>
+</Modal>
+@code {
+    public string Name { get; set; }
+    [ParameterAttribute] 
+    public bool Visible { get; set; } = false;
+    [ParameterAttribute]
+    public EventCallback HandleCancel { get; set; }
+    [ParameterAttribute]
+    public EventCallback<string> HandleOk { get; set; }
+
+    private IEnumerable<string> Validation(string str)
+    {
+        if (str is null)
+        {
+            yield return "Group Name is required!";
+            yield break;
+        }
+        if (str.ToASCIIByte().Length >= StringMarco.MAX_STRING_LENGTH)
+        {
+            yield return "名称过长";
+            yield break;
+        }
+        if (str.Length < 1)
+        {
+            yield return "";
+        }
+    }
+}

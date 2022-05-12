@@ -1,10 +1,12 @@
 ﻿using System.Linq.Expressions;
+using System.Text;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using MisteryBlazor.Data.Context;
 using MisteryBlazor.Data.GroupsModel;
 using MisteryBlazor.Data.GroupsModel.PermissionModel;
 using MisteryBlazor.Data.MessagesModel;
 using MisteryBlazor.Data.User;
+using MisteryBlazor.Marcos;
 using MisteryBlazor.StringUtils;
 
 namespace MisteryBlazor.Services.DAL
@@ -28,8 +30,8 @@ namespace MisteryBlazor.Services.DAL
             ChannelMessages = _context.ChannelMessages.ToList();
             groups = _context.Groups.ToList();
             GroupMembers = _context.GroupMembers.ToList();
-            Channels = _context.Channels.ToList();
             GroupsAvatars = _context.GroupAvatars.ToList();
+            Channels = _context.Channels.ToList();
             ChannelCategorys = _context.ChannelCategories.ToList();
         }
 
@@ -185,7 +187,7 @@ namespace MisteryBlazor.Services.DAL
             return newGroup;
         }
 
-        public async Task SetGroupDeleted(string log, int gid, string uid)
+        public async Task SetGroupDeletedAsync(string log, int gid, string uid)
         {
             if (!GroupMemberVerification("UpdatingName: Verification working.", gid, uid))
             {
@@ -198,10 +200,11 @@ namespace MisteryBlazor.Services.DAL
                 needUpdate.IsDeleted = true;
                 await _context.SaveChangesAsync();
             }
+            _logger.LogInformation(string.Empty, log);
         }
         public async Task UpdateGroupName(string log, int gid, string uid, string newName)
         {
-            if (newName.ToASCIIByte().Length >= 180 || newName.Length == 0) throw new Exception("Group name.length >=180");
+            if (newName.ToASCIIByte().Length >= StringMarco.MAX_STRING_LENGTH || newName.Length == 0) throw new Exception("Group name.length >=StringMarcos.MAX_STRING_LENGTH");
                 if (!GroupMemberVerification("UpdatingName: Verification working.", gid, uid)) return;
             var needUpdate = _context.Groups.Single(g => g.Id == gid);
             needUpdate.GroupName = newName.ToASCIIByte();
@@ -275,8 +278,8 @@ namespace MisteryBlazor.Services.DAL
         {
             _logger.LogInformation(log);
             Dictionary<ChannelCategory, IList<Channel>> result = new();
-            var channels = await GetChannelFromGroupAsync("Loading channels to check category.", gid);
-            var categories = await GetChannelCatagoryFromGroupAsync("Loading categories to check category.", gid);
+            var channels = await GetChannelFromGroupAsync("Loading channels to check category.", gid)!;
+            var categories = await GetChannelCatagoryFromGroupAsync("Loading categories to check category.", gid)!;
             foreach (var category in categories)
             {
                 if (!result.ContainsKey(category))
@@ -284,7 +287,6 @@ namespace MisteryBlazor.Services.DAL
                     result.Add(category,new List<Channel>());
                 }
             }
-
             var keyIds = result.Keys.Select(x => x.Id);
             foreach (var channel in channels)
             {
@@ -303,24 +305,10 @@ namespace MisteryBlazor.Services.DAL
                 return new();
             }
         }
-
-        public async Task<EntityEntry<ChannelCategory>> CreateCategoryAsync(string log, string uid, int gid, string name)
-        {
-            _logger.LogInformation(string.Empty,log);
-            if (name.ToASCIIByte().Length >= 180 || name.Length == 0) throw new Exception("Group name.length >=180");
-            if (!GroupMemberVerification("UpdatingName: Verification working.", gid, uid)) return null;
-            var result =  await _context.ChannelCategories.AddAsync(new ChannelCategory()
-            {
-                GroupId=gid,
-                CategoryName = name.ToASCIIByte()
-            });
-            await _context.SaveChangesAsync();
-            return result;
-        }
         public EntityEntry<ChannelCategory> CreateCategory(string log, string uid, int gid, string name)
         {
             _logger.LogInformation(string.Empty, log);
-            if (name.ToASCIIByte().Length >= 180 || name.Length == 0) throw new Exception("Group name.length >=180");
+            if (name.ToASCIIByte().Length >= StringMarco.MAX_STRING_LENGTH || name.Length == 0) throw new Exception("Group name.length >=StringMarcos.MAX_STRING_LENGTH");
             if (!GroupMemberVerification("UpdatingName: Verification working.", gid, uid))
                 throw new Exception("User not owned this group.");
             var result =  _context.ChannelCategories.Add(new ChannelCategory()
@@ -329,9 +317,11 @@ namespace MisteryBlazor.Services.DAL
                 CategoryName = name.ToASCIIByte()
             });
             _context.SaveChanges();
+            Channels = _context.Channels.ToList();
+            ChannelCategorys = _context.ChannelCategories.ToList();
             return result;
         }
-        public async Task SetCategoryDeleted(string log, int cid, string uid)
+        public async Task SetCategoryDeletedAsync(string log, int cid, string uid)
         {
             if (!GroupMemberVerification("UpdatingName: Verification working.", cid, uid))
             {
@@ -343,14 +333,58 @@ namespace MisteryBlazor.Services.DAL
                 needUpdate.IsDeleted = true;
                 await _context.SaveChangesAsync();
             }
+            _logger.LogInformation(string.Empty, log);
+        }
+        public EntityEntry<Channel> CreateChannel(string log, string uid, int gid, int cid, string name)
+        {
+            _logger.LogInformation(string.Empty, log);
+            if (name.ToASCIIByte().Length >= StringMarco.MAX_STRING_LENGTH || name.Length == 0) throw new Exception("Group name.length >=StringMarcos.MAX_STRING_LENGTH");
+            if (!GroupMemberVerification("UpdatingName: Verification working.", gid, uid))
+                throw new Exception("User not owned this group.");
+            var result = _context.Channels.Add(new Channel()
+            {
+                GroupId = gid,
+                CategoryId = cid,
+                ChannelName = name.ToASCIIByte()
+            });
+            _context.SaveChanges();
+            Channels = _context.Channels.ToList();
+            ChannelCategorys = _context.ChannelCategories.ToList();
+            return result;
+        }
+        public async Task SetChannelDeletedAsync(string log, int cid, string uid)
+        {
+            if (!GroupMemberVerification("UpdatingName: Verification working.", cid, uid))
+            {
+                throw new Exception("Unable to Set Delete: Currect user is not the group owner");
+            }
+            var needUpdate = _context.Channels.Single(g => g.Id == cid);
+            if (!needUpdate.IsDeleted)
+            {
+                needUpdate.IsDeleted = true;
+                await _context.SaveChangesAsync();
+            }
+            _logger.LogInformation(string.Empty, log);
         }
         public async Task UpdateCategoryName(string log, int cid, string uid, string newName)
         {
-            if (newName.ToASCIIByte().Length >= 180 || newName.Length == 0) throw new Exception("Group name.length >=180");
+            if (newName.ToASCIIByte().Length >= StringMarco.MAX_STRING_LENGTH || newName.Length == 0) throw new Exception("Group name.length >=StringMarcos.MAX_STRING_LENGTH");
             if (!GroupMemberVerification("UpdatingName: Verification working.", cid, uid)) return;
             var needUpdate = _context.ChannelCategories.Single(g => g.Id == cid);
             needUpdate.CategoryName = newName.ToASCIIByte();
             await _context.SaveChangesAsync();
+            Channels = _context.Channels.ToList();
+            ChannelCategorys = _context.ChannelCategories.ToList();
+        }
+        public async Task UpdateChannelName(string log, int cid, string uid, string newName)
+        {
+            if (newName.ToASCIIByte().Length >= StringMarco.MAX_STRING_LENGTH || newName.Length == 0) throw new Exception("Group name.length >=StringMarcos.MAX_STRING_LENGTH");
+            if (!GroupMemberVerification("UpdatingName: Verification working.", cid, uid)) return;
+            var needUpdate = _context.Channels.Single(g => g.Id == cid);
+            needUpdate.ChannelName = newName.ToASCIIByte();
+            await _context.SaveChangesAsync();
+            Channels = _context.Channels.ToList();
+            ChannelCategorys = _context.ChannelCategories.ToList();
         }
         public bool GroupMemberVerification(string log, int gid, string uid)
         {

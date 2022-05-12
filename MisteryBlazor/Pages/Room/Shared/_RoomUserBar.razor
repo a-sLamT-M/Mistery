@@ -5,6 +5,7 @@
 @using System.Security.Claims
 @using System.Text
 @using MisteryBlazor.Pages.Room.Dialog
+@using MisteryBlazor.Pages.Room.Dialog.GroupsDialog
 @using MisteryBlazor.Services.DataManager
 @using MisteryBlazor.Services.Events
 @using MisteryBlazor.StringUtils
@@ -30,7 +31,7 @@ else
             <div class=" room-userbar mud-theme-secondary mud-elevation-4">
                 <div class="room-userbar-avatar mt-1">
                     <MudIconButton Style="height: 50px; width: 50px;" class="rounded-circle" Size="Size.Large">
-                        <MudAvatar Style="height: 50px; width: 50px; font-size: 1.7rem;">L</MudAvatar>
+                        <MudAvatar Style="height: 50px; width: 50px; font-size: 1.7rem;">U</MudAvatar>
                     </MudIconButton>
                 </div>
                 <span class="room-userbar-split">
@@ -84,11 +85,12 @@ else
     [ParameterAttribute]
     public Dictionary<Group, bool> comparedGroups { get; set; } // bool: if owned
     [ParameterAttribute]
-    public int currectGroup { get; set; } = 0;
+    public int currentGroup { get; set; } = 0;
     [ParameterAttribute]
     public int lastGroup { get; set; } = 0;
     [ParameterAttribute]
-    public EventCallback<int> OnCurrectGroupChanged { get; set; }
+    public EventCallback<int> OnCurrentGroupChanged { get; set; }
+
     private async Task OpenAddGroupDialog()
     {
         var para = new DialogParameters();
@@ -111,24 +113,24 @@ else
     private async Task GroupCompOnClick(int id)
     {
         StringBuilder sb = new();
-        currectGroup = id;
+        currentGroup = id;
 
         if (lastGroup == 0)
         {
             lastGroup = id;
         }
-        else if(currectGroup != lastGroup)
+        else if(currentGroup != lastGroup)
         {
             sb.Append("room-groupcom-").Append(lastGroup.ToString());
             await JS.InvokeVoidAsync("ChangeClass", sb.ToString(),"room-userbargroup");
-            lastGroup = currectGroup;
+            lastGroup = currentGroup;
             sb.Clear();
         }
 
         sb.Append("room-groupcom-").Append(id.ToString());
         await JS.InvokeVoidAsync("ChangeClass", sb.ToString(),"room-userbargroup-onclick");
         sb.Clear();
-        await OnCurrectGroupChanged.InvokeAsync(currectGroup);
+        await OnCurrentGroupChanged.InvokeAsync(currentGroup);
     }
 
     private async Task HandleDelete(int id)

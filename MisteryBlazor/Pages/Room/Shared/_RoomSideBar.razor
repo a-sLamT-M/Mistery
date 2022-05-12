@@ -3,6 +3,7 @@
 @using System.Text
 @using MisteryBlazor.Data.GroupsModel
 @using MisteryBlazor.Pages.Room.Dialog
+@using MisteryBlazor.Pages.Room.Dialog.ChannelDialog
 @using MisteryBlazor.Pages.Room.Shared.DetialPage
 @using MisteryBlazor.Services.DAL
 @using MisteryBlazor.Services.DataManager
@@ -14,6 +15,7 @@
 @inject ChannelsManager Cm;
 @inject GroupsManager Gm;
 @inject GroupManagerEvents Gme;
+@inject ChannelManagerEvents Cme;
 @inject ISnackbar Snackbar;
 
 <div class="room-sidebar mud-theme-primary mud-elevation-8">
@@ -24,7 +26,7 @@
               OnOverlayHiding="C_Para.EnableCategoryContextMenu">
         <Overlay>
             <Menu>
-                @if (IsOwned && !C_Para.IsMainContextmenuDisabled)
+                @if ((IsOwned || HasCategoryCreatePermission) && !C_Para.IsMainContextmenuDisabled)
                 {
                     <MenuItem OnClick="() => { D_Para.CreateCategoryVisible = true; }">创建一个类别</MenuItem>
                 }
@@ -48,66 +50,46 @@
                 </div>
                 @if (ChannelsMap.Count <= 0)
                 {
-                    @if (IsOwned)
-                    {
-                        <div class="room-sidebar-alert">
-                            <p>该群组还没有任何频道！</p></div>
-                        <div class="room-sidebar-alert-text">① 在<span style="font-weight: bold;"> 空白处 </span>
-                            右键添加一个类别</div>
-                        <div class="room-sidebar-alert-text">
-                            <p>② 在类别名称上右键新建一个频道</p></div>
-                    }
-                    else
-                    {
-                        <div class="room-sidebar-alert">
-                            <p>该群组还没有任何频道！</p></div>
-                    }
+                    <div style="float: left; display: flex;">
+                        @if (IsOwned || HasCategoryCreatePermission)
+                        {
+                            <div class="room-sidebar-alert">
+                                <p>该群组还没有任何频道！</p></div>
+                            <div class="room-sidebar-alert-text">① 在<span style="font-weight: bold;"> 空白处 </span>
+                                右键添加一个类别</div>
+                            <div class="room-sidebar-alert-text">
+                                <p>② 在类别名称上右键新建一个频道</p></div>
+                        }
+                        else
+                        {
+                            <div class="room-sidebar-alert">
+                                <p>该群组还没有任何频道！</p></div>
+                        }
+                    </div>
                 }
             }
-            <div class="room-sidebar-channels ">
+            <div class="room-sidebar-channels">
                 <div class="room-sidebar-category-scroll">
                     @foreach (var c in ChannelsMap)
                     {
                         if (!c.Key.IsDeleted)
                         {
-                            <div @oncontextmenu="C_Para.HidMainContextMenu">
-
-                                <Dropdown Trigger="new Trigger[] { Trigger.ContextMenu }"
-                                          BoundaryAdjustMode="TriggerBoundaryAdjustMode.InScroll"
-                                          Disabled="@C_Para.IsCategoryContextmenuDisabled"
-                                          OnOverlayHiding="C_Para.EnableMainContextMenu">
-                                    <Overlay>
-                                        <Menu>
-                                            @if (HasInvitePermission || IsOwned)
-                                            {
-                                                <MenuItem>删除</MenuItem>
-                                                <MenuItem>创建频道</MenuItem>
-                                                <MenuDivider/>
-                                            }
-                                            <MenuItem>类别属性</MenuItem>
-                                        </Menu>
-                                    </Overlay>
-                                    <ChildContent>
-                                        <MudPaper Width="308px" Elevation="0" Class="room-sidebar-category-mudpaper">
-                                            <MudTreeView Color="Color.Dark" @bind-SelectedValue="SelectedValue" T="string">
-                                                <MudTreeViewItem Value="@c.Key.CategoryName.ToStringFromASCIIByte()" Icon="@Icons.Filled.Label">
-                                                    @foreach (var ch in c.Value)
-                                                    {
-                                                        <MudTreeViewItem Value="@ch.ChannelName.ToStringFromASCIIByte()" Icon="@Icons.Filled.Group"/>
-                                                    }
-                                                </MudTreeViewItem>
-                                            </MudTreeView>
-                                        </MudPaper>
-                                    </ChildContent>
-                                </Dropdown>
-                            </div>
+                            <_RoomSidebarChannel
+                                IsCategoryContextmenuDisabled="@C_Para.IsCategoryContextmenuDisabled"
+                                color="Color.Dark"
+                                ChannelsMap="new KeyValuePair<ChannelCategory, IList<Channel>>(c.Key, c.Value)"
+                                IsOwned="@IsOwned"
+                                HandleChannelCreate="current => { D_Para.CurrentCategory = current; D_Para.CreateChannelDialogVisible = true; }"
+                                HandleCategoryDelete="current => { D_Para.CurrentCategory = current; D_Para.IsDeleteCategoryDialogVisible = true; }"
+                                HidMainContextMenu = "C_Para.HidMainContextMenu"
+                                EnableMainContextMenu="C_Para.EnableMainContextMenu"
+                            />
                         }
                     }
                 </div>
             </div>
         </ChildContent>
     </Dropdown>
-
 
     <div class="room-sidebar-voice mud-theme-secondary" style="display: none;">
         <div class="room-sidebar-voice-voiceInfoIco mud-theme-secondary">
@@ -155,24 +137,53 @@
     </div>
 </div>
 
-<CreateCategory
+<CreateCategoryDialog
     Visible="@D_Para.CreateCategoryVisible"
     HandleCancel="@D_Para.HandleCancel"
-    HandleOk="async name => {await DoCreateCategory(name);}"
+    HandleOk="async name => await DoCreateCategory(name)"
+/>
+
+<CreateChannelDialog
+    Visible="@D_Para.CreateChannelDialogVisible"
+    HandleCancel="@D_Para.HandleCancel"
+    HandleOk="async name => await DoCreateChannel(name)"
+/>
+
+<DeleteCategory
+    Id="@D_Para.CurrentCategory.Id"
+    Context="@D_Para.CurrentCategory.CategoryName.ToStringFromASCIIByte()"
+    Visible="@D_Para.IsDeleteCategoryDialogVisible"
+    HandleCancel="@D_Para.HandleCancel"
+    HandleOk="async id => await DeleteCategory(id)"
 />
 
 @code {
     string SelectedValue { get; set; }
+
     class DialogPara
     {
+        public bool CreateChannelDialogVisible { get; set; } = false;
         public bool CreateCategoryVisible { get; set; } = false;
         public bool IsRenameGroupDialogVisible { get; set; } = false;
+        public bool IsDeleteCategoryDialogVisible { get; set; } = false;
+
+        public ChannelCategory CurrentCategory { get; set; } = new()
+        {
+            Id = 0,  
+            GroupId = 0,
+            CategoryName = string.Empty,
+            IsDeleted = true, 
+            Created = new byte[]{0x00}
+        };
+
         public void HandleCancel()
         {
             CreateCategoryVisible = false;
             IsRenameGroupDialogVisible = false;
+            IsDeleteCategoryDialogVisible = false;
+            CreateChannelDialogVisible = false;
         }
-    }    DialogPara D_Para = new();
+    } DialogPara D_Para = new();
 
     class ContextMenuPara
     {
@@ -194,7 +205,6 @@
         {
             IsCategoryContextmenuDisabled = false;
         }
-
     }
 
     ContextMenuPara C_Para = new();
@@ -210,9 +220,17 @@
     [ParameterAttribute]
     public bool HasInvitePermission { get; set; } = false;
     [ParameterAttribute]
+    public bool HasCategoryDeletePermission { get; set; } = false;
+    [ParameterAttribute]
+    public bool HasCategoryCreatePermission { get; set; } = false;
+    [ParameterAttribute]
+    public bool HasChannelCreatePermission { get; set; } = false;
+    [ParameterAttribute]
+    public bool HasCategoryRenamePermission { get; set; } = false;
+    [ParameterAttribute]
     public bool IsOwned { get; set; } = false;
 
-    public async Task DoCreateCategory(string name)
+    private async Task DoCreateCategory(string name)
     {
         try
         {
@@ -223,9 +241,42 @@
         {
             Snackbar.Add("无法创建该类别", Severity.Error);
         }
-        D_Para.CreateCategoryVisible = false;
+        D_Para.HandleCancel();
     }
-
+    private async Task DoCreateChannel(string name)
+    {
+        try
+        {
+            await Cm.CreateChannelAsync(name, userId, D_Para.CurrentCategory.GroupId,D_Para.CurrentCategory.Id);
+            Snackbar.Add("成功创建该频道", Severity.Success);
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add("无法创建该频道", Severity.Error);
+        }
+        D_Para.HandleCancel();
+    }
+    private async Task DeleteChannel(int cid)
+    {
+        D_Para.HandleCancel();
+    }
+    private async Task DeleteCategory(int id)
+    {
+        try
+        {
+            await Cm.DeleteCategory(userId, id);
+            Snackbar.Add("成功删除该类别", Severity.Success);
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add("无法删除该类别", Severity.Error);
+        }
+        D_Para.HandleCancel();
+    }
+    private void OnCategoryAdded(Dictionary<ChannelCategory, IList<Channel>> map)
+    {
+        ChannelsMap = map;
+    }
     protected override async Task OnInitializedAsync()
     {
          Gme.SelectedGroupChangedEvent += async value =>
@@ -233,5 +284,6 @@
              CurrectGroup = value;
              ChannelsMap = Cm.ChannelsDictionary;
          };
+        Cme.CategoryAddedEvent += OnCategoryAdded;
     }
 }

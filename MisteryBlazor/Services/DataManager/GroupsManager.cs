@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using MisteryBlazor.Data.GroupsModel;
+using MisteryBlazor.Marcos;
 using MisteryBlazor.Services.DAL;
 using MisteryBlazor.Services.Events;
 using MisteryBlazor.StringUtils;
@@ -55,9 +56,9 @@ namespace MisteryBlazor.Services.DataManager
 
         public async Task<int> Create(string uid, string groupName)
         {
-            if (groupName.ToASCIIByte().Length >= 180)
+            if (groupName.ToASCIIByte().Length >= StringMarco.MAX_STRING_LENGTH)
             {
-                throw new Exception("Group name is required in 180 chars");
+                throw new Exception("Group name is required in StringMarco.MAX_STRING_LENGTH chars");
             }
             StringBuilder log = new StringBuilder();
             log.Append("User：").Append(uid).Append(" ").Append("is creating group ").Append(groupName);
@@ -73,7 +74,7 @@ namespace MisteryBlazor.Services.DataManager
             sb.Append(uid).Append(" trying delete group ").Append(gid.ToString());
             try
             {
-                await _Gps.SetGroupDeleted(sb.ToString(), gid, uid);
+                await _Gps.SetGroupDeletedAsync(sb.ToString(), gid, uid);
             }
             catch (Exception e)
             {

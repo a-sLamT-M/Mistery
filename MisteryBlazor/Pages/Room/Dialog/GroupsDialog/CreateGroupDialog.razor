@@ -1,6 +1,7 @@
 ﻿@using System.ComponentModel.DataAnnotations
 @using System.Text
 @using Microsoft.Extensions.Logging
+@using MisteryBlazor.Marcos
 @using MisteryBlazor.Services.DAL
 @using MisteryBlazor.Services.DataManager
 @using MisteryBlazor.StringUtils
@@ -78,7 +79,7 @@
             yield return "Group Name is required!";
             yield break;
         }
-        if (str.ToASCIIByte().Length >= 180)
+        if (str.ToASCIIByte().Length >= StringMarco.MAX_STRING_LENGTH)
         {
             yield return "名称过长";
             yield break;

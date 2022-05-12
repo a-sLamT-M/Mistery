@@ -1,0 +1,20 @@
+﻿<Modal Title="删除类别"
+       Visible="@Visible"
+       OnOk="() => HandleOk.InvokeAsync(Id)"
+       OnCancel="@HandleCancel">
+    <p>您真的要删除 @Context 吗？</p>
+    <p>没有撤回键！</p>
+</Modal>
+@code {
+    [ParameterAttribute]
+    public int Id { get; set; } = 0;
+    [ParameterAttribute] 
+    public bool Visible { get; set; } = false;
+
+    [ParameterAttribute]
+    public string Context { get; set; } = string.Empty;
+    [ParameterAttribute]
+    public EventCallback HandleCancel { get; set; }
+    [ParameterAttribute]
+    public EventCallback<int> HandleOk { get; set; }
+}

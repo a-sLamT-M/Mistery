@@ -25,14 +25,15 @@
 
 .room-sidebar-alert {
     color: gray;
-    font-size: 18px;
-    padding: 65px;
+    font-size: 15px;
+    padding: 10px;
+    padding-top: 20px;
     font-style: italic;
 }
 .room-sidebar-alert-text {
     color: gray;
-    font-size: 15px;
-    padding-left: 60px;
+    font-size: 12px;
+    padding-left: 10px;
 }
 .room-sidebar-top {
     display: flex;
@@ -127,6 +128,7 @@
     cursor: pointer;
 }
 .room-sidebar-category-scroll {
+    height:78.5vh;
     overflow: scroll;
 }
 .room-sidebar-channel-icon {
@@ -373,7 +375,7 @@
 .room-userbar-avatar {
     align-content: center;
     padding-bottom: 10px;
-    padding-left: 3px;
+    padding-left: 1px;
 }
 
 .room-userbar-add-ico-plus {
@@ -423,7 +425,6 @@
 }
 
 .room-userbar-scroll {
-
     height: 88%;
     overflow: scroll;
 }

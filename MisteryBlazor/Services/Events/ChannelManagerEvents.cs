@@ -1,4 +1,5 @@
-﻿using MisteryBlazor.Services.DataManager;
+﻿using MisteryBlazor.Data.GroupsModel;
+using MisteryBlazor.Services.DataManager;
 
 namespace MisteryBlazor.Services.Events
 {
@@ -9,13 +10,12 @@ namespace MisteryBlazor.Services.Events
         {
             _Logger = logger;
         }
-        public delegate Task CategoryUpdated();
-        public event CategoryUpdated CategoryUpdateEvent;
+        public delegate void CategoryAdded(Dictionary<ChannelCategory, IList<Channel>> map);
+        public event CategoryAdded CategoryAddedEvent;
 
-        public async Task CateGoryUpdatedEventCallback()
+        public async Task CateGoryAddedEventCallback(Dictionary<ChannelCategory, IList<Channel>> map)
         {
-            if(CategoryUpdateEvent is not null)
-                _ = CategoryUpdateEvent();
+            CategoryAddedEvent(map);
         }
     }
 }

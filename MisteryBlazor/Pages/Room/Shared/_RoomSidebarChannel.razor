@@ -1,63 +1,88 @@
 ﻿@using MisteryBlazor.Data.GroupsModel
-<div id="@Id" class="room-sidebar-channel">
-    <Dropdown Trigger="new Trigger[] { Trigger.ContextMenu }" Placement="AntDesign.Placement.BottomRight">
-        <Overlay>
-            <Menu>
-                @if (HasRenamePermission || IsOwned)
-                {
-                    <MenuItem OnClick="() => { D_Para.IsRenameChannelDialogVisible = true; }">修改名称</MenuItem>
-                }
-                <MenuItem>属性</MenuItem>
-                @if (HasInvitePermission || IsOwned)
-                {
-                    <MenuItem>创建邀请链接</MenuItem>
-                }
-                <MenuDivider/>
-                @if (IsOwned)
-                {
-                    <MenuItem OnClick="() => { D_Para.IsDeleteDialogVisible = true; }">删除</MenuItem>
-                }
-            </Menu>
-        </Overlay>
-        <ChildContent>
-            <span class="room-sidebar-channel-icon">
-                <MudIcon Size="Size.Small" Icon="@Icons.Outlined.Circle" style="width: 15px; height: 15px;"/>
-            </span>
-            <div class="room-sidebar-channel-text-name">
-                @channel.ChannelName
-            </div>
-        </ChildContent>
-    </Dropdown>
-</div>
+@using MisteryBlazor.StringUtils
+@using Color = AntDesign.Color
+@using System.Text
+@{
+    StringBuilder sb = new();
+    sb.Append("room-sidebar-category-").Append(ChannelsMap.Key.Id.ToString());
+
+    <div id="@sb.ToString() "@oncontextmenu="HidMainContextMenu">
+        <Dropdown Trigger="new Trigger[] { Trigger.ContextMenu }"
+                  BoundaryAdjustMode="TriggerBoundaryAdjustMode.InScroll"
+                  Disabled="@IsCategoryContextmenuDisabled"
+                  OnOverlayHiding="@EnableMainContextMenu">
+            <Overlay>
+                <Menu>
+                    @if (IsOwned || HasRenamePermission)
+                    {
+                        <MenuItem>重命名</MenuItem>
+                    }
+                    @if (IsOwned || HasChannelCreatePermission)
+                    {
+                        <MenuItem OnClick="async () => await HandleChannelCreate.InvokeAsync(ChannelsMap.Key)">创建频道</MenuItem>
+                    }
+                    @if (IsOwned || HasCategoryDeletePermission)
+                    {
+                        <MenuItem OnClick="async () => await HandleCategoryDelete.InvokeAsync(ChannelsMap.Key)">删除类别</MenuItem>
+                    }
+                    <MenuDivider/>
+
+                    <MenuItem>类别属性</MenuItem>
+                </Menu>
+            </Overlay>
+            <ChildContent>
+                <MudPaper Width="308px" Elevation="0" >
+                    <MudTreeView Color="@color" @bind-SelectedValue="SelectedValue" T="string">
+                        <MudTreeViewItem Value="@ChannelsMap.Key.CategoryName.ToStringFromASCIIByte()" Icon="@Icons.Filled.Label">
+                            @foreach (var ch in ChannelsMap.Value)
+                            {
+                                <MudTreeViewItem Value="@ch.ChannelName.ToStringFromASCIIByte()"Icon="@Icons.Filled.Group"/>
+                            }
+                        </MudTreeViewItem>
+                    </MudTreeView>
+                </MudPaper>
+            </ChildContent>
+        </Dropdown>
+    </div>
+}
+
 
 @code {
-    class DialogPara
-    {
-        public bool IsDeleteDialogVisible { get; set; } = false;
-        public bool IsRenameChannelDialogVisible { get; set; } = false;
-        public void HandleCancel()
-        {
-            IsDeleteDialogVisible = false;
-            IsRenameChannelDialogVisible = false;
-        }
-    }
     [ParameterAttribute]
-    public int Id { get; set; }
+    public bool IsCategoryContextmenuDisabled { get; set; }
     [ParameterAttribute]
-    public Channel channel { get; set; }
-    DialogPara D_Para = new();
+    public MudBlazor.Color color { get; set; }
+
+
     [ParameterAttribute]
-    public Action OnClick { get; set; }
+    public KeyValuePair<ChannelCategory, IList<Channel>> ChannelsMap { get; set; } = new();
+
     [ParameterAttribute]
-    public string avatarUri { get; set; }
+    public EventCallback<ChannelCategory> HandleCategoryDelete { get; set; }
     [ParameterAttribute]
-    public EventCallback HandleDelete { get; set; }
+    public EventCallback HandleCategoryRename { get; set; }
     [ParameterAttribute]
-    public EventCallback<string> HandleRename { get; set; }
+    public EventCallback<ChannelCategory> HandleChannelCreate { get; set; }
+
     [ParameterAttribute]
-    public bool IsOwned { get; set; }
+    public EventCallback HidMainContextMenu { get; set; }
+    [ParameterAttribute]
+    public EventCallback EnableMainContextMenu { get; set; }
+
+    [ParameterAttribute]
+    public bool IsOwned { get; set; } = false;
     [ParameterAttribute]
     public bool HasRenamePermission { get; set; } = false;
     [ParameterAttribute]
-    public bool HasInvitePermission { get; set; } = false;
+    public bool HasCategoryDeletePermission { get; set; } = false;
+    [ParameterAttribute]
+    public bool HasChannelCreatePermission { get; set; } = false;
+
+    [ParameterAttribute]
+    public string SelectedValue { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var a = 0;
+    }
 }
