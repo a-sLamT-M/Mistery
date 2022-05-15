@@ -7,6 +7,7 @@
 
 <link href="_content/AntDesign/css/ant-design-blazor.dark.css" rel="stylesheet" />
 
+
 <div id="@Id" class="room-userbargroup ">
     <span class="room-userbargroup-avatar">
             @if(groupName.Length > 0)
@@ -23,6 +24,13 @@
             }
         </span>
 </div>
+
+<RenameGroupDialog
+    Visible="@D_Para.IsRenameGroupDialogVisible" 
+    HandleCancel="D_Para.HandleCancel"
+    HandleOk="async name => {await Rename(name);}"
+    Name="@groupName"
+/>
 
 <DeleteGroup 
     Visible="@D_Para.IsDeleteDialogVisible" 
@@ -58,14 +66,6 @@
     }
     <MisteryContextMenu Id="@sb.ToString()" Items="@items" TargetId="@Id"/>
 }
-
-<RenameGroupDialog
-    Visible="@D_Para.IsRenameGroupDialogVisible" 
-    HandleCancel="D_Para.HandleCancel"
-    HandleOk="async name => {await Rename(name);}"
-    Name="@groupName"
-/>
-
 
 @code {
     class DialogPara
