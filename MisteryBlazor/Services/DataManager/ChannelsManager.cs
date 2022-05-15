@@ -17,13 +17,29 @@ namespace MisteryBlazor.Services.DataManager
         private GroupsManager _Gm;
         private GroupManagerEvents _Gme;
         private ChannelManagerEvents _Cme;
-        private KeyValuePair<Group, bool> CurrectGroup;
+        private KeyValuePair<Group, bool> CurrentGroup;
+        private Channel _SelectedChannel;
+        private int _SelectedChannelId;
         private IList<ChannelCategory> _ChannelCategories;
         private IList<Channel> _Channels;
         private Dictionary<ChannelCategory, IList<Channel>> _ChannelsDictionary = new();
         public Dictionary<ChannelCategory,IList<Channel>> ChannelsDictionary
         {
             get => _ChannelsDictionary;
+        }
+        public int SelectedChannelId
+        {
+            set
+            {
+                _SelectedChannelId = value;
+                var g = _Gps.GetChannelById("RoomMain: Getting Group", value);
+                if (g is not null)
+                {
+                    _SelectedChannel = g;
+                }
+                var callback = (async () => await _Cme.SelectedChannelChangedEventCallback(g));
+                callback.Invoke();
+            }
         }
         public ChannelsManager(ILogger<ChannelsManager> logger, GroupDataService gps, AuthorizationManager Am, GroupsManager Gm, GroupManagerEvents gme,ChannelManagerEvents cme)
         {
@@ -38,15 +54,15 @@ namespace MisteryBlazor.Services.DataManager
         public async Task InitAsync()
         {
             _Gme.SelectedGroupChangedEvent += OnSelectedGroupChanged;
-            CurrectGroup = _Gm.SelectedGroup;
+            CurrentGroup = _Gm.SelectedGroup;
         }
         private async Task OnSelectedGroupChanged(KeyValuePair<Group, bool> newCurrectGroup)
         {
-            CurrectGroup = newCurrectGroup;
-            _Channels = await _Gps.GetChannelFromGroupAsync("Loading Channels.", CurrectGroup.Key.Id)!;
-            _ChannelCategories = await _Gps.GetChannelCatagoryFromGroupAsync("Loading Channel categories List", CurrectGroup.Key.Id)!;
+            CurrentGroup = newCurrectGroup;
+            _Channels = await _Gps.GetChannelFromGroupAsync("Loading Channels.", CurrentGroup.Key.Id)!;
+            _ChannelCategories = await _Gps.GetChannelCatagoryFromGroupAsync("Loading Channel categories List", CurrentGroup.Key.Id)!;
             _ChannelsDictionary =
-            await _Gps.GetChannelWithCatagoryFromGroupAsync("Loading Channel map", CurrectGroup.Key.Id);
+            await _Gps.GetChannelWithCatagoryFromGroupAsync("Loading Channel map", CurrentGroup.Key.Id);
         }
         public async Task<int> CreateCategory(string categoryName, string uid, int gid)
         {
@@ -57,7 +73,7 @@ namespace MisteryBlazor.Services.DataManager
             StringBuilder log = new StringBuilder();
             log.Append("User：").Append(uid).Append(" ").Append("is creating group ").Append(categoryName);
             var result = _Gps.CreateCategory(log.ToString(), uid, gid, categoryName);
-            await OnSelectedGroupChanged(CurrectGroup);
+            await OnSelectedGroupChanged(CurrentGroup);
             await _Cme.CateGoryAddedEventCallback(_ChannelsDictionary);
             return result.Entity.Id;
         }
@@ -68,7 +84,7 @@ namespace MisteryBlazor.Services.DataManager
             StringBuilder log = new StringBuilder();
             log.Append("User：").Append(uid).Append(" ").Append("is creating channel ").Append(channelName);
             var result = _Gps.CreateChannel(log.ToString(), uid, gid, cid, channelName);
-            await OnSelectedGroupChanged(CurrectGroup);
+            await OnSelectedGroupChanged(CurrentGroup);
             await _Cme.CateGoryAddedEventCallback(_ChannelsDictionary);
             return result.Entity.Id;
         }

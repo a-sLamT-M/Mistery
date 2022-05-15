@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using MisteryBlazor.Enums;
 
 namespace MisteryBlazor.Data.User
 {
@@ -11,7 +12,7 @@ namespace MisteryBlazor.Data.User
         [Required]
         public string ReceiverId { get; set; }
         [Required]
-        public string Status { get; set; }
+        public RelationStatus Status { get; set; }
         [Timestamp]
         public byte[] CreationTime { get; set; }
     }

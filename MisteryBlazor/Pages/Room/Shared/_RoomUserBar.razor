@@ -10,7 +10,7 @@
 @using MisteryBlazor.Services.Events
 @using MisteryBlazor.StringUtils
 @using static System.Linq.Enumerable
-@inject GroupDataService gps;
+@inject GroupDataService Gps;
 @inject ChannelsManager Cm;
 @inject NavigationManager uriHelper;
 @inject GroupsManager Gm;
@@ -37,7 +37,7 @@ else
                 <span class="room-userbar-split">
                     <MudDivider DividerType="DividerType.Middle"></MudDivider>
                 </span>
-                <div class="room-userbar-scroll border-solid mud-elevation-3">
+                <div class="room-userbar-scroll border-solid">
                     @if (groups.Any())
                     {
                         StringBuilder sb = new();

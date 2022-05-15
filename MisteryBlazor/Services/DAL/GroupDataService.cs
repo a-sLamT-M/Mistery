@@ -6,6 +6,7 @@ using MisteryBlazor.Data.GroupsModel;
 using MisteryBlazor.Data.GroupsModel.PermissionModel;
 using MisteryBlazor.Data.MessagesModel;
 using MisteryBlazor.Data.User;
+using MisteryBlazor.Enums;
 using MisteryBlazor.Marcos;
 using MisteryBlazor.StringUtils;
 
@@ -20,7 +21,8 @@ namespace MisteryBlazor.Services.DAL
         private List<GroupAvatar> GroupsAvatars;
         private List<ChannelMessage> ChannelMessages;
         private List<Channel> Channels;
-        private List<ChannelCategory> ChannelCategorys;
+        private HashSet<ChannelCategory> ChannelCategorys;
+        private HashSet<UserInRole> UserInRoles;
 
         public GroupDataService(AppDbContext context, ILogger<GroupDataService> logger)
         {
@@ -32,9 +34,14 @@ namespace MisteryBlazor.Services.DAL
             GroupMembers = _context.GroupMembers.ToList();
             GroupsAvatars = _context.GroupAvatars.ToList();
             Channels = _context.Channels.ToList();
-            ChannelCategorys = _context.ChannelCategories.ToList();
+            ChannelCategorys = _context.ChannelCategories.ToHashSet();
+            UserInRoles = _context.UserInRoles.ToHashSet();
         }
-
+        public List<UserInRole> GetAllUserInRoles(string log)
+        {
+            _logger.LogInformation(string.Empty, log);
+            return UserInRoles.ToList();
+        }
         public List<Group> GetAllGroups(string log)
         {
             _logger.LogInformation(string.Empty, log);
@@ -70,7 +77,6 @@ namespace MisteryBlazor.Services.DAL
 
             return groupsSelected.ToList();
         }
-
         public async Task<Dictionary<Group, bool>> CompareIfGroupsIsOnwedByUserAsync(string log, string uid,
             IList<Group> groups)
         {
@@ -118,9 +124,9 @@ namespace MisteryBlazor.Services.DAL
             _logger.LogInformation(string.Empty, log);
             return groupsSelected.ToList();
         }
-
         public Group GetGroupById(string log, int gid)
         {
+            _logger.LogInformation(string.Empty, log);
             return groups.Find(g => g.Id == gid);
         }
         public async Task<Group> GetGroupByIdAsync(string log, int gid)
@@ -167,7 +173,7 @@ namespace MisteryBlazor.Services.DAL
             {
                 GroupId = newGroup.Entity.Id,
                 GroupMemberId = createrId,
-                IsDeleted = false
+                Status = GroupMemberStatus.Accepted
             });
             _context.SaveChanges();
             // add creator to administrator role
@@ -224,11 +230,10 @@ namespace MisteryBlazor.Services.DAL
             _logger.LogInformation(string.Empty, log);
             return Channels;
         }
-
         public List<ChannelCategory> GetAllChannelCategories(string log)
         {
             _logger.LogInformation(string.Empty, log);
-            return ChannelCategorys;
+            return ChannelCategorys.ToList();
         }
         public List<Channel>? GetChannelFromGroup(string log, int gid)
         {
@@ -257,6 +262,17 @@ namespace MisteryBlazor.Services.DAL
                 _logger.LogError(e.Message);
                 return new List<Channel>();
             }
+        }
+
+        public Channel GetChannelById(string log, int cid)
+        {
+            _logger.LogInformation(string.Empty, log);
+            return Channels.Find(c => c.Id == cid);
+        }
+        public async Task<Channel> GetChannelByIdAsync(string log, int cid)
+        {
+            _logger.LogInformation(string.Empty, log);
+            return Channels.Find(c => c.Id == cid);
         }
         public async Task<List<ChannelCategory>>? GetChannelCatagoryFromGroupAsync(string log, int gid)
         {
@@ -318,7 +334,7 @@ namespace MisteryBlazor.Services.DAL
             });
             _context.SaveChanges();
             Channels = _context.Channels.ToList();
-            ChannelCategorys = _context.ChannelCategories.ToList();
+            ChannelCategorys = _context.ChannelCategories.ToHashSet();
             return result;
         }
         public async Task SetCategoryDeletedAsync(string log, int cid, string uid)
@@ -349,7 +365,7 @@ namespace MisteryBlazor.Services.DAL
             });
             _context.SaveChanges();
             Channels = _context.Channels.ToList();
-            ChannelCategorys = _context.ChannelCategories.ToList();
+            ChannelCategorys = _context.ChannelCategories.ToHashSet();
             return result;
         }
         public async Task SetChannelDeletedAsync(string log, int cid, string uid)
@@ -374,7 +390,7 @@ namespace MisteryBlazor.Services.DAL
             needUpdate.CategoryName = newName.ToASCIIByte();
             await _context.SaveChangesAsync();
             Channels = _context.Channels.ToList();
-            ChannelCategorys = _context.ChannelCategories.ToList();
+            ChannelCategorys = _context.ChannelCategories.ToHashSet();
         }
         public async Task UpdateChannelName(string log, int cid, string uid, string newName)
         {
@@ -384,7 +400,7 @@ namespace MisteryBlazor.Services.DAL
             needUpdate.ChannelName = newName.ToASCIIByte();
             await _context.SaveChangesAsync();
             Channels = _context.Channels.ToList();
-            ChannelCategorys = _context.ChannelCategories.ToList();
+            ChannelCategorys = _context.ChannelCategories.ToHashSet();
         }
         public bool GroupMemberVerification(string log, int gid, string uid)
         {

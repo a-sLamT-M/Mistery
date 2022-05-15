@@ -9,21 +9,22 @@
 @using MisteryBlazor.Services.DataManager
 @using MisteryBlazor.Services.Events
 @using MisteryBlazor.StringUtils
+@using OneOf.Types
 @using Placement = AntDesign.Placement
 @using Color = MudBlazor.Color
-@inject GroupDataService gps;
+@inject GroupDataService Gps;
 @inject ChannelsManager Cm;
 @inject GroupsManager Gm;
 @inject GroupManagerEvents Gme;
 @inject ChannelManagerEvents Cme;
 @inject ISnackbar Snackbar;
 
-<div class="room-sidebar mud-theme-primary mud-elevation-8">
+<div class="room-sidebar mud-theme-primary mud-elevation-8" @oncontextmenu="C_Para.EnableMainContextMenu">
     <Dropdown Trigger="new Trigger[] { Trigger.ContextMenu }"
               BoundaryAdjustMode="TriggerBoundaryAdjustMode.InScroll"
               Class="room-sidebar-channels-main-context-menu"
               Disabled="@C_Para.IsMainContextmenuDisabled"
-              OnOverlayHiding="C_Para.EnableCategoryContextMenu">
+              OnOverlayHiding="@C_Para.Init">
         <Overlay>
             <Menu>
                 @if ((IsOwned || HasCategoryCreatePermission) && !C_Para.IsMainContextmenuDisabled)
@@ -50,7 +51,7 @@
                 </div>
                 @if (ChannelsMap.Count <= 0)
                 {
-                    <div style="float: left; display: flex;">
+                    <div style="float: left;">
                         @if (IsOwned || HasCategoryCreatePermission)
                         {
                             <div class="room-sidebar-alert">
@@ -75,14 +76,17 @@
                         if (!c.Key.IsDeleted)
                         {
                             <_RoomSidebarChannel
-                                IsCategoryContextmenuDisabled="@C_Para.IsCategoryContextmenuDisabled"
                                 color="Color.Dark"
                                 ChannelsMap="new KeyValuePair<ChannelCategory, IList<Channel>>(c.Key, c.Value)"
                                 IsOwned="@IsOwned"
+                                OnClick="id=> ChannelCompOnClick(id)"
                                 HandleChannelCreate="current => { D_Para.CurrentCategory = current; D_Para.CreateChannelDialogVisible = true; }"
                                 HandleCategoryDelete="current => { D_Para.CurrentCategory = current; D_Para.IsDeleteCategoryDialogVisible = true; }"
-                                HidMainContextMenu = "C_Para.HidMainContextMenu"
-                                EnableMainContextMenu="C_Para.EnableMainContextMenu"
+                                EnableCategoryMenuCallback="C_Para.EnableCategoryContextMenu"
+                                EnableChannelMenuCallback="C_Para.EnableChannelContextMenu"
+                                IsChannelContextmenuDisabled="@C_Para.IsChannelContextMenuDisabled"
+                                IsCategoryContextmenuDisabled="@C_Para.IsCategoryContextmenuDisabled"
+                                OnOverlayHidingCallback="@C_Para.Init"
                             />
                         }
                     }
@@ -189,21 +193,35 @@
     {
         public bool IsMainContextmenuDisabled = false;
         public bool IsCategoryContextmenuDisabled = false;
-        public void HidMainContextMenu()
+        public bool IsChannelContextMenuDisabled = false;
+
+        /* When can a instance initialize?
+        * when chewing at tuesday.
+        * Because its chewsday init.
+        * ——Lam T. */ 
+        public void Init()
         {
-            IsMainContextmenuDisabled = true;
+            IsMainContextmenuDisabled = false;
+            IsCategoryContextmenuDisabled = false;
+            IsChannelContextMenuDisabled = false;
         }
         public void EnableMainContextMenu()
         {
             IsMainContextmenuDisabled = false;
-        }
-        public void HidCategoryContextMenu()
-        {
             IsCategoryContextmenuDisabled = true;
+            IsChannelContextMenuDisabled = true;
         }
         public void EnableCategoryContextMenu()
         {
             IsCategoryContextmenuDisabled = false;
+            IsChannelContextMenuDisabled = true;
+            IsMainContextmenuDisabled = true;
+        }
+        public void EnableChannelContextMenu()
+        {
+            IsChannelContextMenuDisabled = false;
+            IsMainContextmenuDisabled = true;
+            IsCategoryContextmenuDisabled = true;
         }
     }
 
@@ -218,6 +236,10 @@
     [ParameterAttribute]
     public Dictionary<ChannelCategory, IList<Channel>> ChannelsMap { get; set; } = new();
     [ParameterAttribute]
+    public int CurrentChannelId { get; set; } = 0;
+    [ParameterAttribute]
+    public int LastChannelId { get; set; } = 0;
+    [ParameterAttribute]
     public bool HasInvitePermission { get; set; } = false;
     [ParameterAttribute]
     public bool HasCategoryDeletePermission { get; set; } = false;
@@ -229,6 +251,8 @@
     public bool HasCategoryRenamePermission { get; set; } = false;
     [ParameterAttribute]
     public bool IsOwned { get; set; } = false;
+    [ParameterAttribute]
+    public EventCallback<int> OnCurrentChannelChanged { get; set; }
 
     private async Task DoCreateCategory(string name)
     {
@@ -276,6 +300,14 @@
     private void OnCategoryAdded(Dictionary<ChannelCategory, IList<Channel>> map)
     {
         ChannelsMap = map;
+    }
+    private async Task ChannelCompOnClick(int id)
+    {
+        if (LastChannelId == 0)
+            LastChannelId = id;
+        else if(CurrentChannelId != LastChannelId)
+            CurrentChannelId = id;
+        await OnCurrentChannelChanged.InvokeAsync(id);
     }
     protected override async Task OnInitializedAsync()
     {

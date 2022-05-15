@@ -19,7 +19,7 @@ namespace MisteryBlazor.Data.Context
             base.OnModelCreating(modelBuilder);
         }
         public DbSet<MisteryIdentityUser> MisteryUsers { get; set; }
-        public DbSet<UserAvatars> UserAvatars { get; set; }
+        public DbSet<UserAvatar> UserAvatars { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<GroupAvatar> GroupAvatars { get; set; }
         public DbSet<Channel> Channels { get; set; }

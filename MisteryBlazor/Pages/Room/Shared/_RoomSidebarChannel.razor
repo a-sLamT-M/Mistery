@@ -6,11 +6,10 @@
     StringBuilder sb = new();
     sb.Append("room-sidebar-category-").Append(ChannelsMap.Key.Id.ToString());
 
-    <div id="@sb.ToString() "@oncontextmenu="HidMainContextMenu">
+    <div id="@sb.ToString() "@oncontextmenu="EnableCategoryMenuCallback">
         <Dropdown Trigger="new Trigger[] { Trigger.ContextMenu }"
-                  BoundaryAdjustMode="TriggerBoundaryAdjustMode.InScroll"
                   Disabled="@IsCategoryContextmenuDisabled"
-                  OnOverlayHiding="@EnableMainContextMenu">
+                  OnOverlayHiding="OnOverlayHidingCallback">
             <Overlay>
                 <Menu>
                     @if (IsOwned || HasRenamePermission)
@@ -31,13 +30,38 @@
                 </Menu>
             </Overlay>
             <ChildContent>
-                <MudPaper Width="308px" Elevation="0" >
+                <MudPaper Width="250px" Elevation="0" >
                     <MudTreeView Color="@color" @bind-SelectedValue="SelectedValue" T="string">
                         <MudTreeViewItem Value="@ChannelsMap.Key.CategoryName.ToStringFromASCIIByte()" Icon="@Icons.Filled.Label">
-                            @foreach (var ch in ChannelsMap.Value)
-                            {
-                                <MudTreeViewItem Value="@ch.ChannelName.ToStringFromASCIIByte()"Icon="@Icons.Filled.Group"/>
-                            }
+                            <div style="display: flex;">
+                                @foreach (var ch in ChannelsMap.Value)
+                                {
+                                    <div @oncontextmenu="EnableChannelMenuCallback">
+                                        <Dropdown Trigger="new Trigger[] { Trigger.ContextMenu }"
+                                                  BoundaryAdjustMode="TriggerBoundaryAdjustMode.InScroll"
+                                                  Disabled="@IsChannelContextmenuDisabled"
+                                                  OnOverlayHiding="OnOverlayHidingCallback">
+                                            <Overlay>
+                                                <Menu>
+                                                    @if (IsOwned || HasRenamePermission)
+                                                    {
+                                                        <MenuItem>重命名</MenuItem>
+                                                    }
+                                                    @if (IsOwned || HasCategoryDeletePermission)
+                                                    {
+                                                        <MenuItem OnClick="async () => await HandleCategoryDelete.InvokeAsync(ChannelsMap.Key)">删除频道</MenuItem>
+                                                    }
+                                                    <MenuDivider/>
+                                                    <MenuItem>频道属性</MenuItem>
+                                                </Menu>
+                                            </Overlay>
+                                            <ChildContent>
+                                                <MudTreeViewItem Value="@ch.ChannelName.ToStringFromASCIIByte()" Icon="@Icons.Filled.Group" OnClick="()=>OnClick.InvokeAsync(ch.Id)"/>
+                                            </ChildContent>
+                                        </Dropdown>
+                                    </div>
+                                }
+                            </div>
                         </MudTreeViewItem>
                     </MudTreeView>
                 </MudPaper>
@@ -51,6 +75,8 @@
     [ParameterAttribute]
     public bool IsCategoryContextmenuDisabled { get; set; }
     [ParameterAttribute]
+    public bool IsChannelContextmenuDisabled { get; set; }
+    [ParameterAttribute]
     public MudBlazor.Color color { get; set; }
 
 
@@ -63,11 +89,14 @@
     public EventCallback HandleCategoryRename { get; set; }
     [ParameterAttribute]
     public EventCallback<ChannelCategory> HandleChannelCreate { get; set; }
-
     [ParameterAttribute]
-    public EventCallback HidMainContextMenu { get; set; }
+    public EventCallback EnableCategoryMenuCallback { get; set; }
     [ParameterAttribute]
-    public EventCallback EnableMainContextMenu { get; set; }
+    public EventCallback EnableChannelMenuCallback { get; set; }
+    [ParameterAttribute]
+    public EventCallback OnOverlayHidingCallback { get; set; }
+    [ParameterAttribute]
+    public EventCallback<int> OnClick { get; set; }
 
     [ParameterAttribute]
     public bool IsOwned { get; set; } = false;

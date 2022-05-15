@@ -12,10 +12,17 @@ namespace MisteryBlazor.Services.Events
         }
         public delegate void CategoryAdded(Dictionary<ChannelCategory, IList<Channel>> map);
         public event CategoryAdded CategoryAddedEvent;
-
+        public delegate Task SelectedChannelChanged(Channel channelSelected);
+        public event SelectedChannelChanged SelectedChannelChangedEvent;
         public async Task CateGoryAddedEventCallback(Dictionary<ChannelCategory, IList<Channel>> map)
         {
-            CategoryAddedEvent(map);
+            if (CategoryAddedEvent is not null)
+                CategoryAddedEvent(map);
+        }
+        public async Task SelectedChannelChangedEventCallback(Channel channelSelected)
+        {
+            if (SelectedChannelChangedEvent is not null)
+                SelectedChannelChangedEvent(channelSelected);
         }
     }
 }

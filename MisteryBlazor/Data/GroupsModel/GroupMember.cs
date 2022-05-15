@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using MisteryBlazor.Enums;
 
 namespace MisteryBlazor.Data.GroupsModel
 {
@@ -13,7 +14,7 @@ namespace MisteryBlazor.Data.GroupsModel
         [Required]
         public string GroupMemberId { get; set; }
         [Required]
-        public bool IsDeleted { get; set; }
+        public GroupMemberStatus Status { get; set; }
         [Timestamp]
         public byte[] CreationTime { get; set; }
     }

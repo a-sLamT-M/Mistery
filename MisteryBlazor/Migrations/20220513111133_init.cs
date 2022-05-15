@@ -157,7 +157,7 @@ namespace MisteryBlazor.Migrations
                     CustomPermissionRoleId = table.Column<int>(type: "int", nullable: false),
                     GroupId = table.Column<int>(type: "int", nullable: false),
                     GroupMemberId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     CreationTime = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
@@ -204,7 +204,7 @@ namespace MisteryBlazor.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RequestorId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ReceiverId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     CreationTime = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>

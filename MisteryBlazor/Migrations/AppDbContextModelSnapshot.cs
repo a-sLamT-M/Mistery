@@ -17,7 +17,7 @@ namespace MisteryBlazor.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.4")
+                .HasAnnotation("ProductVersion", "6.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -302,8 +302,8 @@ namespace MisteryBlazor.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -527,16 +527,15 @@ namespace MisteryBlazor.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.ToTable("Relations");
                 });
 
-            modelBuilder.Entity("MisteryBlazor.Data.User.UserAvatars", b =>
+            modelBuilder.Entity("MisteryBlazor.Data.User.UserAvatar", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");

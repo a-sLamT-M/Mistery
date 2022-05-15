@@ -1,9 +1,5 @@
 ﻿@code {
-    public static string SearchText
-    {
-        get;
-        set;
-    }
+    public string SearchText { get; set; }
 }
 
 <div class="room-header mud-theme-primary">
@@ -25,9 +21,6 @@
             </span>
             <span class="room-header-right-ico-peoplealt">
                 <MudIcon Size="Size.Medium" Icon="@Icons.Filled.PeopleAlt"/>
-            </span>
-            <span class="room-header-right-options">
-                <MudIcon Icon="@Icons.Filled.Settings" Size="Size.Medium"/>
             </span>
         </div>
         <div class="room-header-search mud-elevation-1">

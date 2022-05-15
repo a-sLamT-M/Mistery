@@ -8,8 +8,7 @@
 @using MisteryBlazor.Services.Events
 @using MisteryBlazor.StringUtils
 @inherits LayoutComponentBase
-@inject GroupDataService gps;
-@inject IJSRuntime js;
+@inject GroupDataService Gps;
 @inject GroupsManager Gm;
 @inject AuthorizationManager Am;
 @inject ChannelsManager Cm;
@@ -36,13 +35,12 @@
             groups="@Gm.Groups"
             comparedGroups="@Gm.GroupsDictionary"
         />
-        @{
-            <_RoomSideBar
-                UserName=@Am.UserName 
-                userId=@Am.UserId
-                ChannelsMap="@Cm.ChannelsDictionary"
-                IsOwned="@Gm.SelectedGroup.Value"/>
-        }
+        <_RoomSideBar
+            OnCurrentChannelChanged="ChangeCurrentChannel"
+            UserName=@Am.UserName 
+            userId=@Am.UserId
+            ChannelsMap="@Cm.ChannelsDictionary"
+            IsOwned="@Gm.SelectedGroup.Value"/>
     </div>
     <main class="room-page-MainLayout-HeaderBar">
         <_RoomHeaderBar/>
@@ -59,17 +57,13 @@
         await Gm.InitAsync();
         await Cm.InitAsync();
     }
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await js.InvokeVoidAsync("init");
-        }
-    }
-
     private void ChangeCurrentGroup(int gid)
     {
         Gm.SelectedGroupId = gid;
+    }
+    private void ChangeCurrentChannel(int cid)
+    {
+        Cm.SelectedChannelId = cid;
     }
     private readonly MudTheme MisteryTheme = new MudTheme()
     {

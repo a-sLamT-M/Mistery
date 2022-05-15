@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using MisteryBlazor.Data.GroupsModel;
+using MisteryBlazor.Data.User;
 using MisteryBlazor.Marcos;
 using MisteryBlazor.Services.DAL;
 using MisteryBlazor.Services.Events;
@@ -21,6 +22,7 @@ namespace MisteryBlazor.Services.DataManager
         private Dictionary<Group, bool> groupsDictionary;
         private IList<Group> groups;
         private GroupManagerEvents _Gme;
+        private Dictionary<GroupMember, UserInRole> _UserMap;
 
         public KeyValuePair<Group, bool> SelectedGroup => selectedGroup;
         public IList<Group> Groups => groups;

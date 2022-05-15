@@ -1,16 +1,15 @@
 ﻿@using MisteryBlazor.Services.DataManager
-@inject GroupsManager gm
+@inject GroupsManager Gm
 
 <Modal Title="修改名字"
        Visible="@Visible"
-       OnOk="()=>HandleOk.InvokeAsync(newName)"
+       OnOk="()=>HandleOk.InvokeAsync(NewName)"
        OnCancel="@HandleCancel">
     <p>当前群组名： @Name</p>
-    <Input Placeholder="修改为..." @bind-Value="@newName" AutoFocus="true" DefaultValue="@Name"/>
+    <Input Placeholder="修改为..." @bind-Value="@NewName" AutoFocus="true" DefaultValue="@Name"/>
 </Modal>
 @code {
-    private string newName;
-
+    private string NewName;
     [ParameterAttribute] 
     public bool Visible { get; set; } = false;
     [ParameterAttribute]

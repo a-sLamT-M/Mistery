@@ -1,54 +1,27 @@
 ﻿@using MisteryBlazor.Pages.Room.Dialog
 @using MisteryBlazor.Pages.Room.Dialog.GroupsDialog
 @using Placement = AntDesign.Placement
+@using MisteryBlazor.Pages.ContextMenu
+@using System.Text
+@using MongoDB.Driver
+
 <link href="_content/AntDesign/css/ant-design-blazor.dark.css" rel="stylesheet" />
 
 <div id="@Id" class="room-userbargroup ">
-    <Dropdown Trigger="new Trigger[] { Trigger.ContextMenu }" Placement="Placement.BottomRight">
-        <Overlay>
-            <Menu>
-                @if (HasRenamePermission || IsOwned)
-                {
-                    <MenuItem OnClick="() => { D_Para.IsRenameGroupDialogVisible = true; }">修改名称</MenuItem>
-                }
-
-                @if (HasInvitePermission || IsOwned)
-                {
-                    <MenuItem>创建邀请链接</MenuItem>
-                    <MenuDivider/>
-                }
-                <MenuItem>群属性</MenuItem>
-                @if (IsOwned)
-                {
-                    <MenuDivider/>
-                    <MenuItem OnClick="() => { D_Para.IsDeleteDialogVisible = true; }">解散</MenuItem>
-                    <MenuItem>转让</MenuItem>
-                }
-                else
-                {
-                    <MenuItem>退出</MenuItem>
-                }
-            </Menu>
-        </Overlay>
-        <ChildContent>
-            <MudIconButton Style="height: 50px; width: 50px;" class="rounded-circle" Size="Size.Large" OnClick="OnClick">
-                <span class="room-userbargroup-avatar">
-                    @if(groupName.Length > 0)
-                    { 
-                        <MudAvatar Style="height: 50px; width: 50px;">
-                            @groupName[0]
-                        </MudAvatar>
-                    }
-                    else
-                    {
-                        <MudAvatar Style="height: 50px; width: 50px;">
-                            ?
-                        </MudAvatar>
-                    }
-                </span>
-            </MudIconButton>
-        </ChildContent>
-    </Dropdown>
+    <span class="room-userbargroup-avatar">
+            @if(groupName.Length > 0)
+            { 
+                <MudAvatar Style="height: 50px; width: 50px;">
+                    @groupName[0]
+                </MudAvatar>
+            }
+            else
+            {
+                <MudAvatar Style="height: 50px; width: 50px;">
+                    ?
+                </MudAvatar>
+            }
+        </span>
 </div>
 
 <DeleteGroup 
@@ -57,13 +30,42 @@
     HandleOk="Delete"
     Context="@groupName"
 />
-    
+
+@{
+    StringBuilder sb = new();
+    sb.Append(Id).Append("-menu");
+
+    HashSet<MisteryMenuItem> items = new();
+    if (HasRenamePermission || IsOwned)
+    {
+        items.Add(new MisteryMenuItem("修改名称", args => D_Para.IsRenameGroupDialogVisible = true));
+    }
+
+    if (HasInvitePermission || IsOwned)
+    {
+        items.Add(new MisteryMenuItem("创建邀请链接"));
+        items.Add(MisteryMenuItem.MisteryMenuDivider());
+    }
+    items.Add(new MisteryMenuItem("属性"));
+    if (IsOwned)
+    {
+        items.Add(MisteryMenuItem.MisteryMenuDivider());
+        items.Add(new MisteryMenuItem("解散",arg => { D_Para.IsDeleteDialogVisible = true; }));
+    }
+    else
+    {
+        items.Add(new MisteryMenuItem("退出",arg => { D_Para.IsDeleteDialogVisible = true; }));
+    }
+    <MisteryContextMenu Id="@sb.ToString()" Items="@items" TargetId="@Id"/>
+}
+
 <RenameGroupDialog
     Visible="@D_Para.IsRenameGroupDialogVisible" 
     HandleCancel="D_Para.HandleCancel"
     HandleOk="async name => {await Rename(name);}"
     Name="@groupName"
 />
+
 
 @code {
     class DialogPara

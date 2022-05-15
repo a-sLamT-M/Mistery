@@ -21,7 +21,7 @@ namespace MisteryBlazor.Services.DAL
             _logger.LogInformation(string.Empty, log);
             return users;
         }
-        public List<UserAvatars> GetAllUsersAvatars(string log)
+        public List<UserAvatar> GetAllUsersAvatars(string log)
         {
             var usersAvatars = _context.UserAvatars.ToList();
             _logger.LogInformation(string.Empty, log);
@@ -66,7 +66,7 @@ namespace MisteryBlazor.Services.DAL
         // unfinished
         public void SetAvatars(string uid, string avatars)
         {
-            DbSet<UserAvatars> avatarsList = _context.UserAvatars;
+            DbSet<UserAvatar> avatarsList = _context.UserAvatars;
         }
     }
 }

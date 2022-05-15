@@ -1,0 +1,74 @@
+﻿@using System.Text
+@inject IJSRuntime Js;
+
+<div style="background-color: @MenuColor !important;"
+     id="@Id"
+     Class="@Class">
+    @{
+        if (Items is not null)
+        {
+
+            StringBuilder sb = new();
+            foreach (var i in Items)
+            {
+                if (i.ItemName.Equals(Marcos.StringMarco.CONTEXT_MENU_DIVIDER))
+                {
+                    <hr Style="color: @HrColor !important;" class="@HrClass"/>
+                }
+                else
+                {
+                    <div class="@ItemBoxClass"
+                         id="@sb.Append(ItemId).Append("-").Append(i.ItemName).ToString()"
+                         onclick="@i.ItemAction"
+                         Style="color: @ItemTextColor !important;">
+                        @i.ItemName
+                    </div>
+                }
+
+            }
+        }
+    }
+</div>
+
+@code {
+
+
+    [ParameterAttribute]
+    public string TargetId { get; set; }
+    [ParameterAttribute]
+    public string Id { get; set; } = "mistery-contextmenu";
+    [ParameterAttribute]
+    public string Class { get; set; } = "main-contextmenu";
+    [ParameterAttribute]
+    public string ActiveClass { get; set; } = "mistery-contextmenu-active";
+    [ParameterAttribute]
+    public string InactiveClass { get; set; } = "mistery-contextmenu-inactive";
+    [ParameterAttribute]
+    public bool Enable { get; set; } = true;
+    [ParameterAttribute]
+    public string ItemBoxClass { get; set; } = "mistery-contextmenu-item";
+    [ParameterAttribute]
+    public string HrClass { get; set; } = "mistery-contextmenu-item-hr";
+    [ParameterAttribute]
+    public string ItemId { get; set; } = "mistery-contextmenu-item-id";
+    [ParameterAttribute]
+    public string MenuColor { get; set; } = "#1F1F1F";
+    [ParameterAttribute]
+    public string ItemTextColor { get; set; } = "#CCCCCC";
+    [ParameterAttribute]
+    public string HrColor { get; set; } = "#DDDDDD";
+    [ParameterAttribute]
+    public HashSet<MisteryMenuItem> Items { get; set; }
+    
+    protected override async Task OnAfterRenderAsync(bool isRendered)
+    {
+        if (Enable && isRendered)
+        {
+            await Js.InvokeVoidAsync("EnableContextMenu", Id, TargetId, ActiveClass, InactiveClass);
+        }
+        else
+        {
+            await Js.InvokeVoidAsync("DisableContextMenu", Id, TargetId, ActiveClass, InactiveClass);
+        }
+    }
+}

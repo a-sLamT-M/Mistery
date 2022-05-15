@@ -2,7 +2,7 @@
 
 namespace MisteryBlazor.Data.User
 {
-    public class UserAvatars
+    public class UserAvatar
     {
         [Key]
         public string Id { get; set; }
