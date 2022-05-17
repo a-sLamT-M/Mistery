@@ -7,22 +7,22 @@
 
 <link href="_content/AntDesign/css/ant-design-blazor.dark.css" rel="stylesheet" />
 
-
-<div id="@Id" class="room-userbargroup ">
+<!--need animation-->
+ <div class="room-userbargroup" id="@Id" onclick="@OnClick">
     <span class="room-userbargroup-avatar">
-            @if(groupName.Length > 0)
-            { 
-                <MudAvatar Style="height: 50px; width: 50px;">
-                    @groupName[0]
-                </MudAvatar>
-            }
-            else
-            {
-                <MudAvatar Style="height: 50px; width: 50px;">
-                    ?
-                </MudAvatar>
-            }
-        </span>
+        @if (groupName.Length > 0)
+        {
+            <MudAvatar Style="height: 50px; width: 50px;">
+                @groupName[0]
+            </MudAvatar>
+        }
+        else
+        {
+            <MudAvatar Style="height: 50px; width: 50px;">
+                ?
+            </MudAvatar>
+        }
+    </span>
 </div>
 
 <RenameGroupDialog

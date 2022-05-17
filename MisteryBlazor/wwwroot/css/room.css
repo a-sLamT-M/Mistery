@@ -2,25 +2,86 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 @imoprt url('_content/MudBlazor/MudBlazor.min.js');
 
-.room {
+.app {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
 }
+
+.room-base {
+    flex: 1;
+    z-index: auto;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    overflow: hidden;
+    min-width: 0;
+    min-height: 0;
+}
+
 ::-webkit-scrollbar {
     display: none
 }
 
 .room-page-MainLayout {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     display: flex;
+    overflow: hidden;
+    flex-direction: column;
+}
+
+.room-page-MainLayout-right {
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-start;
+    min-width: 0;
+    min-height: 0;
+    flex: 1 1 auto;
     height: 100%;
+}
+
+.room-page-MainLayout-right-base {
+    flex-direction: column;
+    position: relative;
+    flex: 1;
+    height: 100%;
+}
+
+.room-Main-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    display: flex;
 }
 
 .room-sidebar {
     display: flex;
     flex-direction: column;
-    flex: 1;
-    height: 100%;
-    width: 100%;
-    background-color: #262829;
+    align-items: stretch;
+    min-height: 0;
+    width: 270px;
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: flex-start;
+    min-height: 0;
+    position: relative;
 }
 
 .room-sidebar-alert {
@@ -38,21 +99,44 @@
 .room-sidebar-top {
     display: flex;
     justify-content: space-between;
-    height: auto;
-    width: auto;
-           align-items: center;
+    align-items: center;
     padding: 11px;
     padding-bottom: -5px;
     color: white;
 }
 
 .room-sidebar-channels {
-    padding: 15px;
-    padding-top: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    flex: 1 1 auto;
+    min-height: 0;
+    position: relative;
 }
 .room-sidebar-category {
     flex: 1;
 }
+
+.room-sidebar-body {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    flex: 1 1 auto;
+    min-height: 0;
+    position: relative;
+}
+
+.room-sidebar-main-container {
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    flex: 1 1 auto;
+    min-height: 0;
+    position: relative;
+}
+
 .room-sidebar-channels-main-context-menu {
     display: flex;
     align-items: stretch;
@@ -127,8 +211,8 @@
     cursor: pointer;
 }
 .room-sidebar-category-scroll {
-    height:78.5vh;
-    overflow: scroll;
+    overflow: hidden scroll;
+    padding: 8px;
 }
 .room-sidebar-channel-icon {
     color: white;
@@ -142,10 +226,35 @@
 }
 
 .room-sidebar-voice, .room-sidebar-profile {
-    display: flex;
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 auto;
     justify-content: space-between;
+    flex: 0 0 auto;
     align-items: center;
-    color: gray;
+    display: flex;
+}
+
+.room-sidebar-profile-container {
+    height: 62px;
+    font-size: 14px;
+    font-weight: 500;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    margin-bottom: 1px;
+}
+
+.room-sidebar-usercontext {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-end;
+    flex: 1 1 auto;
+    min-height: 0;
+    position: relative;
+    z-index: 1;
 }
 
 .room-sidebar-voice-VoiceInfo {
@@ -154,7 +263,6 @@
     align-items: center;
     padding: 10px;
 }
-
 .room-sidebar-voice-voiceico {
     margin-left: 4px;
     color: #22A848;
@@ -265,12 +373,6 @@
     color: #CCCCCC;
 }
 
-.room-page-MainLayout-HeaderBar {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-}
-
 .room-header-right-search-input {
     background: transparent;
     display: flex;
@@ -285,11 +387,31 @@
 }
 
 .room-chat {
+    min-width: 0;
+    min-height: 0;
     display: flex;
     flex-direction: column;
-    flex: 1;
-    background-color: #2D2F33;
-    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    flex: 1 1 auto;
+}
+
+.room-chat-body {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    flex: 1 1 auto;
+}
+
+.room-chat-body-message {
+    position: relative;
+    -webkit-box-flex: 1;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
 }
 
 .room-chat-input-icons {
@@ -307,6 +429,11 @@
     margin: 20px;
     border-top: 1px solid #484A4D;
     background-color: #37393B;
+    position: relative;
+    flex-shrink: 0;
+    padding-left: 16px;
+    padding-right: 16px;
+    margin-top: -8px;
 }
 
 .room-chat-input-icon-plus, .room-chat-input-form-icons-cardgiftcard, .room-chat-input-form-icons-emoji, .room-chat-input-form-icons-gif, .room-chat-input-form-SubmitButton {
@@ -359,15 +486,31 @@
 }
 
 .room-mainlayout-sidebar {
-    display: flex;
-    flex: 0.22;
-    height: auto;
-    width: auto;
+    position: relative;
+    width: 72px;
 }
 
 .room-userbar {
-    padding: 10px;
-    margin-right: 0px;
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    align-items: center;
+    height: 100%;
+}
+
+.room-userbar-container {
+    overflow: scroll;
+    padding-right: 0px;
+    padding: 8px 5px 5px 5px;
+}
+
+.room-userbar-unusedbottom {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    background: transparent;
 }
 
 .room-userbar-avatar {
@@ -380,7 +523,6 @@
 .room-userbar-add-ico-plus {
     margin-left: 10px;
     margin-top: 9px;
-
 }
 
 .room-userbar-groups-func {
@@ -423,10 +565,6 @@
     filter: brightness(0.5);
 }
 
-.room-userbar-scroll {
-    height: 88%;
-    overflow: scroll;
-}
 .room-userbar-split {
 }
 

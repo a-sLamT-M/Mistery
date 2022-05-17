@@ -17,7 +17,7 @@
                 }
                 else
                 {
-                    <div class="@ItemBoxClass"
+                    <div class="@ItemBoxClass unable-to-select"
                          id="@sb.Append(ItemId).Append("-").Append(i.ItemName).ToString()"
                          onclick="@i.ItemAction"
                          Style="color: @ItemTextColor !important;">
@@ -31,8 +31,6 @@
 </div>
 
 @code {
-
-
     [ParameterAttribute]
     public string TargetId { get; set; }
     [ParameterAttribute]

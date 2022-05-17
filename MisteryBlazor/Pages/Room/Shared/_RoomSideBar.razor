@@ -2,6 +2,7 @@
 @using System.Security.Claims
 @using System.Text
 @using MisteryBlazor.Data.GroupsModel
+@using MisteryBlazor.Pages.ContextMenu
 @using MisteryBlazor.Pages.Room.Dialog
 @using MisteryBlazor.Pages.Room.Dialog.ChannelDialog
 @using MisteryBlazor.Pages.Room.Shared.DetialPage
@@ -18,40 +19,20 @@
 @inject GroupManagerEvents Gme;
 @inject ChannelManagerEvents Cme;
 @inject ISnackbar Snackbar;
-
-<div class="room-sidebar mud-theme-primary mud-elevation-8" @oncontextmenu="C_Para.EnableMainContextMenu">
-    <Dropdown Trigger="new Trigger[] { Trigger.ContextMenu }"
-              BoundaryAdjustMode="TriggerBoundaryAdjustMode.InScroll"
-              Class="room-sidebar-channels-main-context-menu"
-              Disabled="@C_Para.IsMainContextmenuDisabled"
-              OnOverlayHiding="@C_Para.Init">
-        <Overlay>
-            <Menu>
-                @if ((IsOwned || HasCategoryCreatePermission) && !C_Para.IsMainContextmenuDisabled)
-                {
-                    <MenuItem OnClick="() => { D_Para.CreateCategoryVisible = true; }">创建一个类别</MenuItem>
-                }
-                @if (HasInvitePermission || IsOwned)
-                {
-                    <MenuItem>创建邀请链接</MenuItem>
-                }
-                <MenuDivider/>
-                <MenuItem>群属性</MenuItem>
-            </Menu>
-        </Overlay>
-        <ChildContent>
+<div id="room-sidebar-main" class="room-sidebar">
+    <div class="room-sidebar-main-container mud-theme-primary mud-elevation-2">
+        <div class="room-sidebar-body">
             @if (CurrectGroup.Key is not null && !CurrectGroup.Key.IsDeleted)
             {
-                <div class="room-sidebar-top mud-theme-primary">
-
-                            <div class="room-sidebar-textgroup">
-                                <div class="fs-4 fw-bold room-sidebar-top-text">@CurrectGroup.Key.GroupName.ToStringFromASCIIByte()</div>
-                                <div class="fs-7 room-sidebar-top-text-id"># @CurrectGroup.Key.Id</div>
-                            </div>
+                <div class="room-sidebar-top mud-theme-primary unable-to-select">
+                    <div class="room-sidebar-textgroup">
+                        <div class="fs-4 fw-bold room-sidebar-top-text">@CurrectGroup.Key.GroupName.ToStringFromASCIIByte()</div>
+                        <div class="fs-7 room-sidebar-top-text-id"># @CurrectGroup.Key.Id</div>
+                    </div>
                 </div>
                 @if (ChannelsMap.Count <= 0)
                 {
-                    <div style="float: left;">
+                    <div style="float: left; padding: 20px;" class="unable-to-select">
                         @if (IsOwned || HasCategoryCreatePermission)
                         {
                             <div class="room-sidebar-alert">
@@ -70,7 +51,7 @@
                 }
             }
             <div class="room-sidebar-channels">
-                <div class="room-sidebar-category-scroll">
+                <div class="room-sidebar-category-scroll ">
                     @foreach (var c in ChannelsMap)
                     {
                         if (!c.Key.IsDeleted)
@@ -79,64 +60,69 @@
                                 color="Color.Dark"
                                 ChannelsMap="new KeyValuePair<ChannelCategory, IList<Channel>>(c.Key, c.Value)"
                                 IsOwned="@IsOwned"
-                                OnClick="id=> ChannelCompOnClick(id)"
+                                OnClick="id => ChannelCompOnClick(id)"
                                 HandleChannelCreate="current => { D_Para.CurrentCategory = current; D_Para.CreateChannelDialogVisible = true; }"
-                                HandleCategoryDelete="current => { D_Para.CurrentCategory = current; D_Para.IsDeleteCategoryDialogVisible = true; }"
-                                EnableCategoryMenuCallback="C_Para.EnableCategoryContextMenu"
-                                EnableChannelMenuCallback="C_Para.EnableChannelContextMenu"
-                                IsChannelContextmenuDisabled="@C_Para.IsChannelContextMenuDisabled"
-                                IsCategoryContextmenuDisabled="@C_Para.IsCategoryContextmenuDisabled"
-                                OnOverlayHidingCallback="@C_Para.Init"
-                            />
+                                HandleCategoryDelete="current => { D_Para.CurrentCategory = current; D_Para.IsDeleteCategoryDialogVisible = true; }"/>
                         }
                     }
                 </div>
             </div>
-        </ChildContent>
-    </Dropdown>
-
-    <div class="room-sidebar-voice mud-theme-secondary" style="display: none;">
-        <div class="room-sidebar-voice-voiceInfoIco mud-theme-secondary">
-            <span class="room-sidebar-voice-voiceico">
-                <MudIcon Icon="@Icons.Outlined.SignalCellularAlt" Size="Size.Medium"></MudIcon>
-            </span>
-            <div class="room-sidebar-voice-VoiceInfo">
-                <div class="fw-bold room-sidebar-voice-VoiceInfo-text-VoiceConnected">Voice Connected</div>
-                <div class="room-sidebar-voice-VoiceInfo-text-stream">Stream</div>
-            </div>
         </div>
-        <div class="room-sidebar-voice-icons">
-            <span class="room-sidebar-voice-icons-OutlinedInfo">
-                <MudIcon Icon="@Icons.Outlined.Info"></MudIcon>
-            </span>
-            <span class="room-sidebar-voice-icons-FulledCall">
-                <MudIcon Icon="@Icons.Filled.Call"></MudIcon>
-            </span>
-        </div>
-    </div>
-
-    <div class="room-sidebar-profile mud-theme-secondary mud-elevation-5">
-        <span class="room-sidebar-profile-avatar">
-            <MudAvatar Size="Size.Medium"></MudAvatar>
-        </span>
-        @{
-            StringBuilder UserId = new();
-            UserId.Append("# ").Append(@userId);
-            <div class="room-sidebar-profile-info">
-                <div class="fs-7 room-sidebar-profile-info-name fw-bold">@UserName</div>
-                <div class="room-sidebar-profile-info-id">@userId</div>
+        <div class="room-sidebar-usercontext">
+            <div class="room-sidebar-voice mud-theme-secondary" style="display: none;">
+                <div class="room-sidebar-voice-voiceInfoIco mud-theme-secondary">
+                    <span class="room-sidebar-voice-voiceico">
+                        <MudIcon Icon="@Icons.Outlined.SignalCellularAlt" Size="Size.Medium"></MudIcon>
+                    </span>
+                    <div class="room-sidebar-voice-VoiceInfo">
+                        <div class="fw-bold room-sidebar-voice-VoiceInfo-text-VoiceConnected">Voice Connected</div>
+                        <div class="room-sidebar-voice-VoiceInfo-text-stream">Stream</div>
+                    </div>
+                </div>
+                <div class="room-sidebar-voice-icons">
+                    <span class="room-sidebar-voice-icons-OutlinedInfo">
+                        <MudIcon Icon="@Icons.Outlined.Info"></MudIcon>
+                    </span>
+                    <span class="room-sidebar-voice-icons-FulledCall">
+                        <MudIcon Icon="@Icons.Filled.Call"></MudIcon>
+                    </span>
+                </div>
             </div>
-        }
-        <div class="room-sidebar-profile-icons">
-            <span class="room-sidebar-profile-icons-mic">
-                <MudIcon Icon="@Icons.Filled.Mic" Size="Size.Medium"></MudIcon>
-            </span>
-            <span class="room-sidebar-profile-icons-headset">
-                <MudIcon Icon="@Icons.Filled.Headset" Size="Size.Medium"></MudIcon>
-            </span>
-            <span class="room-sidebar-profile-icons-setting">
-                <MudIcon Icon="@Icons.Filled.Settings" Size="Size.Medium"></MudIcon>
-            </span>
+
+            <div class="room-sidebar-profile mud-theme-secondary">
+                <div class="room-sidebar-profile-container">
+                    <span class="room-sidebar-profile-avatar">
+                        <MudAvatar Size="Size.Medium"></MudAvatar>
+                    </span>
+                    @{
+                        StringBuilder UserId = new();
+                        UserId.Append("# ").Append(@userId);
+                        <div class="room-sidebar-profile-info">
+                            @if (UserName.Length >= 10)
+                            {
+                                string newName = UserName[0..10] + "...";
+                                <div class="fs-7 room-sidebar-profile-info-name fw-bold">@newName</div>
+                            }
+                            else
+                            {
+                                <div class="fs-7 room-sidebar-profile-info-name fw-bold">@UserName</div>
+                            }
+                            <div class="room-sidebar-profile-info-id">@UserId.ToString()</div>
+                        </div>
+                    }
+                    <div class="room-sidebar-profile-icons">
+                        <span class="room-sidebar-profile-icons-mic">
+                            <MudIcon Icon="@Icons.Filled.Mic" Size="Size.Medium"></MudIcon>
+                        </span>
+                        <span class="room-sidebar-profile-icons-headset">
+                            <MudIcon Icon="@Icons.Filled.Headset" Size="Size.Medium"></MudIcon>
+                        </span>
+                        <span class="room-sidebar-profile-icons-setting">
+                            <MudIcon Icon="@Icons.Filled.Settings" Size="Size.Medium"></MudIcon>
+                        </span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -161,6 +147,24 @@
     HandleOk="async id => await DeleteCategory(id)"
 />
 
+
+@{
+    @if (CurrectGroup.Key is not null)
+    {
+        HashSet<MisteryMenuItem> ContextMainMenuItems = new();
+        @if (IsOwned || HasCategoryCreatePermission)
+        {
+            ContextMainMenuItems.Add(new MisteryMenuItem("创建一个类别",arg => D_Para.CreateCategoryVisible = true));
+        }
+        @if (IsOwned || HasInvitePermission )
+        {
+            ContextMainMenuItems.Add(new MisteryMenuItem("创建邀请链接"));
+        }
+        ContextMainMenuItems.Add(MisteryMenuItem.MisteryMenuDivider());
+        ContextMainMenuItems.Add(new MisteryMenuItem("群属性"));
+        <MisteryContextMenu Id="room-sidebar-mainmenu" Items="@ContextMainMenuItems" TargetId="room-sidebar-main"/>
+    }
+}
 @code {
     string SelectedValue { get; set; }
 
@@ -188,44 +192,6 @@
             CreateChannelDialogVisible = false;
         }
     } DialogPara D_Para = new();
-
-    class ContextMenuPara
-    {
-        public bool IsMainContextmenuDisabled = false;
-        public bool IsCategoryContextmenuDisabled = false;
-        public bool IsChannelContextMenuDisabled = false;
-
-        /* When can a instance initialize?
-        * when chewing at tuesday.
-        * Because its chewsday init.
-        * ——Lam T. */ 
-        public void Init()
-        {
-            IsMainContextmenuDisabled = false;
-            IsCategoryContextmenuDisabled = false;
-            IsChannelContextMenuDisabled = false;
-        }
-        public void EnableMainContextMenu()
-        {
-            IsMainContextmenuDisabled = false;
-            IsCategoryContextmenuDisabled = true;
-            IsChannelContextMenuDisabled = true;
-        }
-        public void EnableCategoryContextMenu()
-        {
-            IsCategoryContextmenuDisabled = false;
-            IsChannelContextMenuDisabled = true;
-            IsMainContextmenuDisabled = true;
-        }
-        public void EnableChannelContextMenu()
-        {
-            IsChannelContextMenuDisabled = false;
-            IsMainContextmenuDisabled = true;
-            IsCategoryContextmenuDisabled = true;
-        }
-    }
-
-    ContextMenuPara C_Para = new();
 
     [ParameterAttribute]
     public KeyValuePair<Group,bool> CurrectGroup { get; set; }

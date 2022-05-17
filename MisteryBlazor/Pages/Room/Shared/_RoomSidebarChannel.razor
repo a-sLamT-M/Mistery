@@ -2,83 +2,65 @@
 @using MisteryBlazor.StringUtils
 @using Color = AntDesign.Color
 @using System.Text
+@using MisteryBlazor.Pages.ContextMenu
 @{
     StringBuilder sb = new();
     sb.Append("room-sidebar-category-").Append(ChannelsMap.Key.Id.ToString());
 
-    <div id="@sb.ToString() "@oncontextmenu="EnableCategoryMenuCallback">
-        <Dropdown Trigger="new Trigger[] { Trigger.ContextMenu }"
-                  Disabled="@IsCategoryContextmenuDisabled"
-                  OnOverlayHiding="OnOverlayHidingCallback">
-            <Overlay>
-                <Menu>
-                    @if (IsOwned || HasRenamePermission)
-                    {
-                        <MenuItem>重命名</MenuItem>
-                    }
-                    @if (IsOwned || HasChannelCreatePermission)
-                    {
-                        <MenuItem OnClick="async () => await HandleChannelCreate.InvokeAsync(ChannelsMap.Key)">创建频道</MenuItem>
-                    }
-                    @if (IsOwned || HasCategoryDeletePermission)
-                    {
-                        <MenuItem OnClick="async () => await HandleCategoryDelete.InvokeAsync(ChannelsMap.Key)">删除类别</MenuItem>
-                    }
-                    <MenuDivider/>
-
-                    <MenuItem>类别属性</MenuItem>
-                </Menu>
-            </Overlay>
-            <ChildContent>
-                <MudPaper Width="250px" Elevation="0" >
-                    <MudTreeView Color="@color" @bind-SelectedValue="SelectedValue" T="string">
-                        <MudTreeViewItem Value="@ChannelsMap.Key.CategoryName.ToStringFromASCIIByte()" Icon="@Icons.Filled.Label">
-                            <div style="display: flex;">
-                                @foreach (var ch in ChannelsMap.Value)
-                                {
-                                    <div @oncontextmenu="EnableChannelMenuCallback">
-                                        <Dropdown Trigger="new Trigger[] { Trigger.ContextMenu }"
-                                                  BoundaryAdjustMode="TriggerBoundaryAdjustMode.InScroll"
-                                                  Disabled="@IsChannelContextmenuDisabled"
-                                                  OnOverlayHiding="OnOverlayHidingCallback">
-                                            <Overlay>
-                                                <Menu>
-                                                    @if (IsOwned || HasRenamePermission)
-                                                    {
-                                                        <MenuItem>重命名</MenuItem>
-                                                    }
-                                                    @if (IsOwned || HasCategoryDeletePermission)
-                                                    {
-                                                        <MenuItem OnClick="async () => await HandleCategoryDelete.InvokeAsync(ChannelsMap.Key)">删除频道</MenuItem>
-                                                    }
-                                                    <MenuDivider/>
-                                                    <MenuItem>频道属性</MenuItem>
-                                                </Menu>
-                                            </Overlay>
-                                            <ChildContent>
-                                                <MudTreeViewItem Value="@ch.ChannelName.ToStringFromASCIIByte()" Icon="@Icons.Filled.Group" OnClick="()=>OnClick.InvokeAsync(ch.Id)"/>
-                                            </ChildContent>
-                                        </Dropdown>
-                                    </div>
-                                }
+    <div id="@sb.ToString()" class="unable-to-select">
+        <MudPaper Width="251px" Elevation="0" >
+            <MudTreeView Color="@color" @bind-SelectedValue="SelectedValue" T="string" id="@sb.ToString()">
+                <MudTreeViewItem Value="@ChannelsMap.Key.CategoryName.ToStringFromASCIIByte()" Icon="@Icons.Filled.Label">
+                @foreach (var ch in ChannelsMap.Value)
+                        {
+                            sb.Clear();
+                            sb.Append("room-sidebar-").Append(ch.Id);
+                            <div id="@sb.ToString()">
+                                <MudTreeViewItem Value="@ch.ChannelName.ToStringFromASCIIByte()" Icon="@Icons.Filled.Group" OnClick="()=>OnClick.InvokeAsync(ch.Id)"/>
                             </div>
-                        </MudTreeViewItem>
-                    </MudTreeView>
-                </MudPaper>
-            </ChildContent>
-        </Dropdown>
+                                HashSet<MisteryMenuItem> ChannelMenu = new();
+                                if (IsOwned || HasRenamePermission)
+                                {
+                                    ChannelMenu.Add(new MisteryMenuItem("重命名"));
+                                }
+                                if (IsOwned || HasCategoryDeletePermission)
+                                {
+                                    ChannelMenu.Add(new MisteryMenuItem("删除频道", arg => HandleCategoryDelete.InvokeAsync(ChannelsMap.Key)));
+                                }
+                                ChannelMenu.Add(MisteryMenuItem.MisteryMenuDivider());
+                                ChannelMenu.Add(new MisteryMenuItem("属性"));
+                                <MisteryContextMenu Id="room-sidebar-channelmenu" Items="@ChannelMenu" TargetId="@sb.ToString()"/>
+                        }
+                </MudTreeViewItem>
+            </MudTreeView>
+        </MudPaper>
     </div>
 }
 
+@{
+    sb.Clear();
+    sb.Append("room-sidebar-category-").Append(ChannelsMap.Key.Id.ToString());
+    HashSet<MisteryMenuItem> CategoryMenu = new();
+    @if (IsOwned || HasRenamePermission)
+    {
+        CategoryMenu.Add(new MisteryMenuItem("重命名"));
+    }
+    @if (IsOwned || HasChannelCreatePermission)
+    {
+        CategoryMenu.Add(new MisteryMenuItem("创建频道", arg => HandleChannelCreate.InvokeAsync(ChannelsMap.Key)));
+    }
+    @if (IsOwned || HasCategoryDeletePermission)
+    {
+        CategoryMenu.Add(new MisteryMenuItem("删除类别", arg => HandleCategoryDelete.InvokeAsync(ChannelsMap.Key)));
+    }
+    CategoryMenu.Add(MisteryMenuItem.MisteryMenuDivider());
+    CategoryMenu.Add(new MisteryMenuItem("属性"));
+    <MisteryContextMenu Id="room-sidebar-categorymenu" Items="@CategoryMenu" TargetId="@sb.ToString()"/>
+}
 
 @code {
     [ParameterAttribute]
-    public bool IsCategoryContextmenuDisabled { get; set; }
-    [ParameterAttribute]
-    public bool IsChannelContextmenuDisabled { get; set; }
-    [ParameterAttribute]
     public MudBlazor.Color color { get; set; }
-
 
     [ParameterAttribute]
     public KeyValuePair<ChannelCategory, IList<Channel>> ChannelsMap { get; set; } = new();
@@ -89,12 +71,6 @@
     public EventCallback HandleCategoryRename { get; set; }
     [ParameterAttribute]
     public EventCallback<ChannelCategory> HandleChannelCreate { get; set; }
-    [ParameterAttribute]
-    public EventCallback EnableCategoryMenuCallback { get; set; }
-    [ParameterAttribute]
-    public EventCallback EnableChannelMenuCallback { get; set; }
-    [ParameterAttribute]
-    public EventCallback OnOverlayHidingCallback { get; set; }
     [ParameterAttribute]
     public EventCallback<int> OnClick { get; set; }
 

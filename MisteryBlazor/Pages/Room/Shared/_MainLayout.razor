@@ -27,26 +27,33 @@
                   Theme="MisteryTheme"
                   />
 <PageTitle>MisteryBlazor</PageTitle>
-<div class="room-page-MainLayout">
-    <div class="room-mainlayout-sidebar">
-        <_RoomUserBar
-            OnCurrentGroupChanged="ChangeCurrentGroup" 
-            userId=@Am.UserId 
-            groups="@Gm.Groups"
-            comparedGroups="@Gm.GroupsDictionary"
-        />
-        <_RoomSideBar
-            OnCurrentChannelChanged="ChangeCurrentChannel"
-            UserName=@Am.UserName 
-            userId=@Am.UserId
-            ChannelsMap="@Cm.ChannelsDictionary"
-            IsOwned="@Gm.SelectedGroup.Value"/>
+<div class="app">
+    <div class="room-base">
+        <div aria-hidden="false" class="room-page-MainLayout">
+            <div class="room-Main-container">
+                <div class="room-mainlayout-sidebar">
+                    <_RoomUserBar
+                        OnCurrentGroupChanged="ChangeCurrentGroup"
+                        userId=@Am.UserId
+                        groups="@Gm.Groups"
+                        comparedGroups="@Gm.GroupsDictionary"/>
+                </div>
+                <div class="room-page-MainLayout-right-base">
+                    <div class="room-page-MainLayout-right" style="position: relative;">
+                        <_RoomSideBar
+                            OnCurrentChannelChanged="ChangeCurrentChannel"
+                            UserName=@Am.UserName
+                            userId=@Am.UserId
+                            ChannelsMap="@Cm.ChannelsDictionary"
+                            IsOwned="@Gm.SelectedGroup.Value"/>
+                        <_RoomChat/>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <main class="room-page-MainLayout-HeaderBar">
-        <_RoomHeaderBar/>
-        <_RoomChat/>
-    </main>
 </div>
+
 @code {
     private _RoomUserBar UserBar;
 

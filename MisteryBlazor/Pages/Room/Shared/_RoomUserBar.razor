@@ -19,62 +19,57 @@
 @inject ISnackbar Snackbar;
 @inject IDialogService DialogService;
 
-
 @if (groups is null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    <AuthorizeView>
-        <Authorized>
-            <div class=" room-userbar mud-theme-secondary mud-elevation-4">
-                <div class="room-userbar-avatar mt-1">
-                    <MudIconButton Style="height: 50px; width: 50px;" class="rounded-circle" Size="Size.Large">
-                        <MudAvatar Style="height: 50px; width: 50px; font-size: 1.7rem;">U</MudAvatar>
-                    </MudIconButton>
-                </div>
-                <span class="room-userbar-split">
-                    <MudDivider DividerType="DividerType.Middle"></MudDivider>
-                </span>
-                <div class="room-userbar-scroll border-solid">
-                    @if (groups.Any())
+    <div class="room-userbar mud-theme-secondary mud-elevation-1">
+        <div class="room-userbar-container">
+            <div class="room-userbar-avatar mt-1">
+                <MudIconButton Style="height: 50px; width: 50px;" class="rounded-circle" Size="Size.Large">
+                    <MudAvatar Style="height: 50px; width: 50px; font-size: 1.7rem;">U</MudAvatar>
+                </MudIconButton>
+            </div>
+            <span class="room-userbar-split">
+                <MudDivider DividerType="DividerType.Middle"></MudDivider>
+            </span>
+            @if (groups.Any())
+            {
+                StringBuilder sb = new();
+                <div class="room-userbar-groups-func">
+                    @foreach (var group in comparedGroups)
                     {
-                        StringBuilder sb = new();
-                        <div class="room-userbar-groups-func">
-                            @foreach (var group in comparedGroups)
-                            {
-                                if(group.Key.IsDeleted) continue;
-                                sb.Append("room-groupcom-").Append(group.Key.Id.ToString());
-                                <_RoomUserBarGroup
-                                    groupName=@group.Key.GroupName.ToStringFromASCIIByte()
-                                    OnClick="async () => { await GroupCompOnClick(group.Key.Id); }" 
-                                    Id="@sb.ToString()"
-                                    IsOwned="group.Value"
-                                    HandleDelete="async () => { await HandleDelete(group.Key.Id); }"
-                                    HandleRename="async name => { await HandleRename(userId, group.Key.Id, name);}"
-                                />
-                                sb.Clear();
-                            }
-                        </div>
+                        if (group.Key.IsDeleted) continue;
+                        sb.Append("room-groupcom-").Append(group.Key.Id.ToString());
+                        <_RoomUserBarGroup
+                            groupName=@group.Key.GroupName.ToStringFromASCIIByte()
+                            OnClick="async () => { await GroupCompOnClick(group.Key.Id); }"
+                            Id="@sb.ToString()"
+                            IsOwned="group.Value"
+                            HandleDelete="async () => { await HandleDelete(group.Key.Id); }"
+                            HandleRename="async name => { await HandleRename(userId, group.Key.Id, name); }"/>
+                        sb.Clear();
                     }
-                    <span class="room-userbar-split pt-1">
-                        <MudDivider DividerType="DividerType.Middle"></MudDivider>
-                    </span>
-                    <div class="room-userbar-add-button pt-3">
-                        <div class="room-userbar-add">
-                            <MudIconButton Style="height: 50px; width: 50px;" class="rounded-circle " Icon="@Icons.Filled.GroupAdd" Variant="Variant.Filled" Color="MudBlazor.Color.Success" Size="Size.Large" @onclick="OpenAddGroupDialog"/>
-                        </div>
-                    </div>
-                    <div class="room-userbar-add-button pt-3">
-                        <div class="room-userbar-add">
-                            <MudIconButton Style="height: 50px; width: 50px;" class="rounded-circle" Icon="@Icons.TwoTone.Search" Variant="Variant.Filled" Color="MudBlazor.Color.Success" Size="Size.Large"/>
-                        </div>
-                    </div>
                 </div>
+            }
+            <span class="room-userbar-split pt-1">
+                <MudDivider DividerType="DividerType.Middle"></MudDivider>
+            </span>
+            <div class="room-userbar-add-button pt-3">
+                <div class="room-userbar-add">
+                    <MudIconButton Style="height: 50px; width: 50px;" class="rounded-circle " Icon="@Icons.Filled.GroupAdd" Variant="Variant.Filled" Color="MudBlazor.Color.Success" Size="Size.Large" @onclick="OpenAddGroupDialog"/>
                 </div>
-        </Authorized>
-    </AuthorizeView>
+            </div>
+            <div class="room-userbar-add-button pt-3">
+                <div class="room-userbar-add">
+                    <MudIconButton Style="height: 50px; width: 50px;" class="rounded-circle" Icon="@Icons.TwoTone.Search" Variant="Variant.Filled" Color="MudBlazor.Color.Success" Size="Size.Large"/>
+                </div>
+            </div>
+        </div>
+    </div>
+
 }
 
 @code {
