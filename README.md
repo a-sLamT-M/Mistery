@@ -1,8 +1,12 @@
 # Environment
+Visual Studio 2022
+
 .NET 6 
 
 ASP.NET Core 6
 
 ECMAScript 5+
 
-A Brain
+Humam Brain 2022+
+
+Lam T. 2020+
