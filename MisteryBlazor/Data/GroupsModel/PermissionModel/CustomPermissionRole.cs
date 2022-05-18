@@ -2,6 +2,9 @@
 
 namespace MisteryBlazor.Data.GroupsModel.PermissionModel
 {
+    /// <summary>
+    /// 群主的全局自定义权限组模型，GroupId 标记这条数据属于哪个群
+    /// </summary>
     public class CustomPermissionRole
     {
         [Key]

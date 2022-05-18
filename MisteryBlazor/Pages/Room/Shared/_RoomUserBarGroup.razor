@@ -52,12 +52,12 @@
     if (HasInvitePermission || IsOwned)
     {
         items.Add(new MisteryMenuItem("创建邀请链接"));
-        items.Add(MisteryMenuItem.MisteryMenuDivider());
+        items.Add(MisteryMenuItem.Divider());
     }
     items.Add(new MisteryMenuItem("属性"));
     if (IsOwned)
     {
-        items.Add(MisteryMenuItem.MisteryMenuDivider());
+        items.Add(MisteryMenuItem.Divider());
         items.Add(new MisteryMenuItem("解散",arg => { D_Para.IsDeleteDialogVisible = true; }));
     }
     else

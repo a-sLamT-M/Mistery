@@ -2,6 +2,9 @@
 
 namespace MisteryBlazor.Data.GroupsModel
 {
+    /// <summary>
+    /// 频道类别模型，GroupId 标记该类别属于哪个群
+    /// </summary>
     public class ChannelCategory
     {
         [Key]

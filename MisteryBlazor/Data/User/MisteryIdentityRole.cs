@@ -3,6 +3,9 @@ using MisteryBlazor.StringUtils;
 
 namespace MisteryBlazor.Data.User
 {
+    /// <summary>
+    /// IdentityRole 的重载，修改了 Id 的生成方式
+    /// </summary>
     public class MisteryIdentityRole : IdentityRole
     {
         public MisteryIdentityRole()

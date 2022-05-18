@@ -3,12 +3,13 @@ using MisteryBlazor.Enums;
 
 namespace MisteryBlazor.Data.GroupsModel
 {
+    /// <summary>
+    /// 群成员模型
+    /// </summary>
     public class GroupMember
     {
         [Key]
         public int Id { get; set; }
-        [Required]
-        public int CustomPermissionRoleId { get; set; }
         [Required]
         public int GroupId { get; set; }
         [Required]

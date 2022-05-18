@@ -2,6 +2,9 @@
 
 namespace MisteryBlazor.Data.GroupsModel
 {
+    /// <summary>
+    /// 群组模型，GroupOwnerId 为群主的 UID
+    /// </summary>
     public class Group
     {
         [Key]

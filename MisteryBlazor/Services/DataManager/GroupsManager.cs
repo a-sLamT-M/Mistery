@@ -48,12 +48,12 @@ namespace MisteryBlazor.Services.DataManager
             _Gps = gps;
             _Am = am;
             _Gme = groupManagerEvents;
-            _ = InitAsync();
+            Init();
         }
-        public async Task InitAsync()
+        public void Init()
         {
-            groups = await _Gps.GetGroupsFromUserAsync("RoomUserBar: Getting Groups.", _Am.UserId)!;
-            groupsDictionary = await _Gps.CompareIfGroupsIsOnwedByUserAsync("RoomUserBar: Comparing groups with uid.", _Am.UserId, Groups);
+            groups = _Gps.GetGroupsFromUser("RoomUserBar: Getting Groups.", _Am.UserId)!;
+            groupsDictionary = _Gps.CompareIfGroupsIsOnwedByUser("RoomUserBar: Comparing groups with uid.", _Am.UserId, Groups);
         }
 
         public async Task<int> Create(string uid, string groupName)
@@ -65,7 +65,7 @@ namespace MisteryBlazor.Services.DataManager
             StringBuilder log = new StringBuilder();
             log.Append("User：").Append(uid).Append(" ").Append("is creating group ").Append(groupName);
             var result = _Gps.CreateNewGroup(log.ToString(), groupName, uid);
-            await InitAsync();
+            Init();
             await _Gme.GroupAddedEventCallbackAsync(groupsDictionary, groups);
             return result.Entity.Id;
         }

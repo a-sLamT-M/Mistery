@@ -12,6 +12,9 @@ using MisteryBlazor.StringUtils;
 
 namespace MisteryBlazor.Services.DAL
 {
+    /// <summary>
+    /// 关于群组的数据访问层，
+    /// </summary>
     public class GroupDataService
     {
         private readonly AppDbContext _context;
@@ -37,29 +40,53 @@ namespace MisteryBlazor.Services.DAL
             ChannelCategorys = _context.ChannelCategories.ToHashSet();
             UserInRoles = _context.UserInRoles.ToHashSet();
         }
+
+        /// <summary>
+        /// 获取整个 UserInRoles 表
+        /// </summary>
+        /// <param name="log"></param>
+        /// <returns>UserInRoles List</returns>
         public List<UserInRole> GetAllUserInRoles(string log)
         {
             _logger.LogInformation(string.Empty, log);
             return UserInRoles.ToList();
         }
+        /// <summary>
+        /// 获取整个 Groups 表
+        /// </summary>
+        /// <param name="log"></param>
+        /// <returns>Groups List</returns>
         public List<Group> GetAllGroups(string log)
         {
             _logger.LogInformation(string.Empty, log);
             return groups;
         }
+        /// <summary>
+        /// 获取整个 GroupAvatars 表
+        /// </summary>
+        /// <param name="log"></param>
+        /// <returns>GroupAvatars List</returns>
         public List<GroupAvatar> GetAllGroupAvatar(string log)
         {
             _logger.LogInformation(string.Empty, log);
             return GroupsAvatars;
         }
+
         public async Task<IEnumerable<GroupAvatar>>? GetAllGroupAvatarAsync(string log, string uid)
         {
-            var groups = await GetGroupsFromUserAsync(log, uid);
+            var groups = GetGroupsFromUser(log, uid);
             var groupsAvatar = _context.GroupAvatars.ToList();
             return (from a in groupsAvatar
-                    where (from g in groups select g.Id).Equals(a.groupId)
+                    where (from g in groups select g.Id).Equals(a.GroupId)
                     select a);
         }
+
+        /// <summary>
+        /// 获取整个 GroupMember 表
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="gid"></param>
+        /// <returns>GroupMembers List</returns>
         public List<GroupMember> GetAllGroupsMember(string log, int gid)
         {
             var groupsMember =
@@ -67,16 +94,7 @@ namespace MisteryBlazor.Services.DAL
             _logger.LogInformation(string.Empty, log);
             return (List<GroupMember>)groupsMember;
         }
-        public async Task<List<Group>>? GetGroupsFromUserAsync(string log, string uid)
-        {
-            HashSet<int> groupId = new HashSet<int>(GroupMembers
-                .Where(gm => gm.GroupMemberId == uid)
-                .Select(g => g.GroupId));
-            var groupsSelected = groups.Where(m => groupId.Contains(m.Id));
-            _logger.LogInformation(string.Empty, log);
 
-            return groupsSelected.ToList();
-        }
         public async Task<Dictionary<Group, bool>> CompareIfGroupsIsOnwedByUserAsync(string log, string uid,
             IList<Group> groups)
         {
@@ -94,27 +112,35 @@ namespace MisteryBlazor.Services.DAL
             }
             return groupsWithBools;
         }
+        /// <summary>
+        /// 比较给定的群组是否为给定的 uid 用户所有
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="uid"></param>
+        /// <param name="group"></param>
+        /// <returns></returns>
         public KeyValuePair<Group,bool> CompareIfGroupIsOnwedByUser(string log, string uid, Group group)
         {
             return new KeyValuePair<Group, bool>(@group, @group.GroupOwnerId == uid);
         }
+        /// <summary>
+        /// 比较给定群组列表内每个群组是否为给定的 uid 用户所有
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="uid"></param>
+        /// <param name="groups"></param>
+        /// <returns>Group and Bool Dictionary</returns>
         public Dictionary<Group, bool> CompareIfGroupsIsOnwedByUser(string log, string uid,
             IList<Group> groups)
         {
-            Dictionary<Group, bool> groupsWithBools = new Dictionary<Group, bool>();
-            foreach (var group in groups)
-            {
-                if (group.GroupOwnerId == uid)
-                {
-                    groupsWithBools.Add(group, true);
-                }
-                else
-                {
-                    groupsWithBools.Add(group, false);
-                }
-            }
-            return groupsWithBools;
+            return groups.ToDictionary(group => group, group => group.GroupOwnerId == uid);
         }
+        /// <summary>
+        /// 根据用户 uid 获取所有用户所在的群
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="uid"></param>
+        /// <returns>Groups List</returns>
         public List<Group>? GetGroupsFromUser(string log, string uid)
         {
             HashSet<int> groupId = new HashSet<int>(GroupMembers
@@ -124,7 +150,13 @@ namespace MisteryBlazor.Services.DAL
             _logger.LogInformation(string.Empty, log);
             return groupsSelected.ToList();
         }
-        public Group GetGroupById(string log, int gid)
+        /// <summary>
+        /// 根据群的 gid 获取整个群模型
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="gid"></param>
+        /// <returns>Group</returns>
+        public Group? GetGroupById(string log, int gid)
         {
             _logger.LogInformation(string.Empty, log);
             return groups.Find(g => g.Id == gid);
@@ -133,11 +165,23 @@ namespace MisteryBlazor.Services.DAL
         {
             return groups.Find(g => g.Id == gid);
         }
+        /// <summary>
+        /// 获取整个 GroupsMember 表内数据
+        /// </summary>
+        /// <param name="log"></param>
+        /// <returns>GroupsMember List</returns>
         public List<GroupMember> GetAllGroupsMemberList(string log)
         {
             _logger.LogInformation(string.Empty, log);
             return GroupMembers;
         }
+        /// <summary>
+        /// 创建一个群，并返回新创建的群实体
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="groupName"></param>
+        /// <param name="createrId"></param>
+        /// <returns>Group EntityEntry</returns>
         public EntityEntry<Group> CreateNewGroup(string log, string groupName, string createrId)
         {
             _logger.LogInformation(string.Empty, log);
@@ -193,6 +237,14 @@ namespace MisteryBlazor.Services.DAL
             return newGroup;
         }
 
+        /// <summary>
+        /// 异步地伪删除一个群组
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="gid"></param>
+        /// <param name="uid"></param>
+        /// <returns>Task</returns>
+        /// <exception cref="Exception"></exception>
         public async Task SetGroupDeletedAsync(string log, int gid, string uid)
         {
             if (!GroupMemberVerification("UpdatingName: Verification working.", gid, uid))
@@ -208,6 +260,15 @@ namespace MisteryBlazor.Services.DAL
             }
             _logger.LogInformation(string.Empty, log);
         }
+        /// <summary>
+        /// 更新群组名字
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="gid"></param>
+        /// <param name="uid"></param>
+        /// <param name="newName"></param>
+        /// <returns>Task</returns>
+        /// <exception cref="Exception"></exception>
         public async Task UpdateGroupName(string log, int gid, string uid, string newName)
         {
             if (newName.ToASCIIByte().Length >= StringMarco.MAX_STRING_LENGTH || newName.Length == 0) throw new Exception("Group name.length >=StringMarcos.MAX_STRING_LENGTH");
@@ -216,15 +277,32 @@ namespace MisteryBlazor.Services.DAL
             needUpdate.GroupName = newName.ToASCIIByte();
             await _context.SaveChangesAsync();
         }
+        /// <summary>
+        /// 判断 gid 组的所有者是不是 uid
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="gid"></param>
+        /// <param name="uid"></param>
+        /// <returns>bool</returns>
         public bool IsUserOwnedGroup(string log, int gid, string uid)
         {
             return groups.Single(g => g.Id == gid).GroupOwnerId == uid;
         }
+        /// <summary>
+        /// 获取整个 ChannelMessages 表
+        /// </summary>
+        /// <param name="log"></param>
+        /// <returns>ChannelMessages List</returns>
         public List<ChannelMessage> GetAllMessages(string log)
         {
             _logger.LogInformation(string.Empty, log);
             return ChannelMessages;
         }
+        /// <summary>
+        /// 获取整个 Channels 表
+        /// </summary>
+        /// <param name="log"></param>
+        /// <returns>Channel List</returns>
         public List<Channel> GetAllChannels(string log)
         {
             _logger.LogInformation(string.Empty, log);

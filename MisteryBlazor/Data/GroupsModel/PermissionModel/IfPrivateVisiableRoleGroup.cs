@@ -2,6 +2,9 @@
 
 namespace MisteryBlazor.Data.GroupsModel.PermissionModel
 {
+    /// <summary>
+    /// 私有频道权限组白名单模型，标记对于设为私密的频道 ChannelId，什么权限组 RoleId 内的成员可以查看
+    /// </summary>
     public class IfPrivateVisiableRoleGroup
     {
         [Key]

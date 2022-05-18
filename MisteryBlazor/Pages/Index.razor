@@ -10,19 +10,9 @@
     <error statusCode="404" redirect="FileNotFound.htm" />
 </customErrors>
 <h1>Hello, world!</h1>
-<div id="test-target" style="background-color: #CCCCCC; height: 4000px;">
-    gwaaaaaaaa
-</div>
-<MisteryContextMenu Id="test-menu" Items="@items" TargetId="test-target"/>
+
 <SurveyPrompt Title="How is Blazor working for you?" />
 
 @code{
-    HashSet<MisteryMenuItem> items = new()
-    {
-        new MisteryMenuItem("1234567", t => { return; }),
-        new MisteryMenuItem(
-            Marcos.StringMarco.CONTEXT_MENU_DIVIDER, 
-            t => { return; }),
-        new MisteryMenuItem("1234567", t => { return; }),
-    };
+
 }

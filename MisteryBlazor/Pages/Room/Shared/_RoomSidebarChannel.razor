@@ -27,7 +27,7 @@
                                 {
                                     ChannelMenu.Add(new MisteryMenuItem("删除频道", arg => HandleCategoryDelete.InvokeAsync(ChannelsMap.Key)));
                                 }
-                                ChannelMenu.Add(MisteryMenuItem.MisteryMenuDivider());
+                                ChannelMenu.Add(MisteryMenuItem.Divider());
                                 ChannelMenu.Add(new MisteryMenuItem("属性"));
                                 <MisteryContextMenu Id="room-sidebar-channelmenu" Items="@ChannelMenu" TargetId="@sb.ToString()"/>
                         }
@@ -53,7 +53,7 @@
     {
         CategoryMenu.Add(new MisteryMenuItem("删除类别", arg => HandleCategoryDelete.InvokeAsync(ChannelsMap.Key)));
     }
-    CategoryMenu.Add(MisteryMenuItem.MisteryMenuDivider());
+    CategoryMenu.Add(MisteryMenuItem.Divider());
     CategoryMenu.Add(new MisteryMenuItem("属性"));
     <MisteryContextMenu Id="room-sidebar-categorymenu" Items="@CategoryMenu" TargetId="@sb.ToString()"/>
 }

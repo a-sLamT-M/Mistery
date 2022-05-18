@@ -2,6 +2,9 @@
 
 namespace MisteryBlazor.Data.MessagesModel
 {
+    /// <summary>
+    /// 频道消息模型
+    /// </summary>
     public class ChannelMessage
     {
         [Key]

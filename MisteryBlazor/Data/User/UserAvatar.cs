@@ -2,6 +2,9 @@
 
 namespace MisteryBlazor.Data.User
 {
+    /// <summary>
+    /// 同 GroupAvatar 模型
+    /// </summary>
     public class UserAvatar
     {
         [Key]

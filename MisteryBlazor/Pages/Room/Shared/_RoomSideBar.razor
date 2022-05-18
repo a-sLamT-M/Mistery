@@ -22,18 +22,18 @@
 <div id="room-sidebar-main" class="room-sidebar">
     <div class="room-sidebar-main-container mud-theme-primary mud-elevation-2">
         <div class="room-sidebar-body">
-            @if (CurrectGroup.Key is not null && !CurrectGroup.Key.IsDeleted)
+            @if (CurrentGroup.Key is not null && !CurrentGroup.Key.IsDeleted)
             {
                 <div class="room-sidebar-top mud-theme-primary unable-to-select">
                     <div class="room-sidebar-textgroup">
-                        <div class="fs-4 fw-bold room-sidebar-top-text">@CurrectGroup.Key.GroupName.ToStringFromASCIIByte()</div>
-                        <div class="fs-7 room-sidebar-top-text-id"># @CurrectGroup.Key.Id</div>
+                        <div class="fs-4 fw-bold room-sidebar-top-text">@CurrentGroup.Key.GroupName.ToStringFromASCIIByte()</div>
+                        <div class="fs-7 room-sidebar-top-text-id"># @CurrentGroup.Key.Id</div>
                     </div>
                 </div>
                 @if (ChannelsMap.Count <= 0)
                 {
                     <div style="float: left; padding: 20px;" class="unable-to-select">
-                        @if (IsOwned || HasCategoryCreatePermission)
+                        @if (CurrentGroup.Value || HasCategoryCreatePermission)
                         {
                             <div class="room-sidebar-alert">
                                 <p>该群组还没有任何频道！</p></div>
@@ -51,7 +51,7 @@
                 }
             }
             <div class="room-sidebar-channels">
-                <div class="room-sidebar-category-scroll ">
+                <div class="room-sidebar-category-scroll room-scroller room-scroller-base-black">
                     @foreach (var c in ChannelsMap)
                     {
                         if (!c.Key.IsDeleted)
@@ -59,7 +59,7 @@
                             <_RoomSidebarChannel
                                 color="Color.Dark"
                                 ChannelsMap="new KeyValuePair<ChannelCategory, IList<Channel>>(c.Key, c.Value)"
-                                IsOwned="@IsOwned"
+                                IsOwned="@CurrentGroup.Value"
                                 OnClick="id => ChannelCompOnClick(id)"
                                 HandleChannelCreate="current => { D_Para.CurrentCategory = current; D_Para.CreateChannelDialogVisible = true; }"
                                 HandleCategoryDelete="current => { D_Para.CurrentCategory = current; D_Para.IsDeleteCategoryDialogVisible = true; }"/>
@@ -126,7 +126,6 @@
         </div>
     </div>
 </div>
-
 <CreateCategoryDialog
     Visible="@D_Para.CreateCategoryVisible"
     HandleCancel="@D_Para.HandleCancel"
@@ -149,18 +148,18 @@
 
 
 @{
-    @if (CurrectGroup.Key is not null)
+    @if (CurrentGroup.Key is not null)
     {
         HashSet<MisteryMenuItem> ContextMainMenuItems = new();
-        @if (IsOwned || HasCategoryCreatePermission)
+        @if (CurrentGroup.Value || HasCategoryCreatePermission)
         {
             ContextMainMenuItems.Add(new MisteryMenuItem("创建一个类别",arg => D_Para.CreateCategoryVisible = true));
         }
-        @if (IsOwned || HasInvitePermission )
+        @if (CurrentGroup.Value || HasInvitePermission )
         {
             ContextMainMenuItems.Add(new MisteryMenuItem("创建邀请链接"));
         }
-        ContextMainMenuItems.Add(MisteryMenuItem.MisteryMenuDivider());
+        ContextMainMenuItems.Add(MisteryMenuItem.Divider());
         ContextMainMenuItems.Add(new MisteryMenuItem("群属性"));
         <MisteryContextMenu Id="room-sidebar-mainmenu" Items="@ContextMainMenuItems" TargetId="room-sidebar-main"/>
     }
@@ -168,6 +167,9 @@
 @code {
     string SelectedValue { get; set; }
 
+    /// <summary>
+    /// 内部类，提供用于本组件所有 Dialog 的操作和状态数据
+    /// </summary>
     class DialogPara
     {
         public bool CreateChannelDialogVisible { get; set; } = false;
@@ -194,7 +196,7 @@
     } DialogPara D_Para = new();
 
     [ParameterAttribute]
-    public KeyValuePair<Group,bool> CurrectGroup { get; set; }
+    public KeyValuePair<Group,bool> CurrentGroup { get; set; }
     [ParameterAttribute]
     public string userId { get; set; }
     [ParameterAttribute]
@@ -216,15 +218,13 @@
     [ParameterAttribute]
     public bool HasCategoryRenamePermission { get; set; } = false;
     [ParameterAttribute]
-    public bool IsOwned { get; set; } = false;
-    [ParameterAttribute]
     public EventCallback<int> OnCurrentChannelChanged { get; set; }
 
     private async Task DoCreateCategory(string name)
     {
         try
         {
-            await Cm.CreateCategory(name, userId, CurrectGroup.Key.Id);
+            await Cm.CreateCategory(name, userId, CurrentGroup.Key.Id);
             Snackbar.Add("成功创建该类别", Severity.Success);
         }
         catch (Exception e)
@@ -279,7 +279,7 @@
     {
          Gme.SelectedGroupChangedEvent += async value =>
          {
-             CurrectGroup = value;
+             CurrentGroup = value;
              ChannelsMap = Cm.ChannelsDictionary;
          };
         Cme.CategoryAddedEvent += OnCategoryAdded;

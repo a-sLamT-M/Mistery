@@ -32,7 +32,11 @@
 }
 
 ::-webkit-scrollbar {
-    display: none
+    display: block;
+    width: 10em;
+    overflow: auto;
+    height: 2em;
+    background-color: transparent;
 }
 
 .room-page-MainLayout {
@@ -608,4 +612,16 @@
 
 .room-dialog-text {
     color: #ffffff;
+}
+
+.room-scroller::-webkit-scrollbar {
+    z-index: 1;
+    width: 5px;
+    height: 0px;
+}
+
+.room-scroller-base-black::-webkit-scrollbar-thumb {
+    background: #2B2B2B;
+    background: #3B3B3F;
+    border-radius: 10px;
 }

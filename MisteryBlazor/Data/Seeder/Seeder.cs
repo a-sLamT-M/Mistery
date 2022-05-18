@@ -3,6 +3,9 @@ using MisteryBlazor.Data.Context;
 
 namespace MisteryBlazor.Data.Seeder
 {
+    /// <summary>
+    /// 初始化数据库
+    /// </summary>
     public class Seeder
     {
         private AppDbContext DbContext;

@@ -7,7 +7,9 @@
 @using MisteryBlazor.Services.DataManager
 @using MisteryBlazor.Services.Events
 @using MisteryBlazor.StringUtils
+
 @inherits LayoutComponentBase
+
 @inject GroupDataService Gps;
 @inject GroupsManager Gm;
 @inject AuthorizationManager Am;
@@ -41,11 +43,11 @@
                 <div class="room-page-MainLayout-right-base">
                     <div class="room-page-MainLayout-right" style="position: relative;">
                         <_RoomSideBar
+                            CurrentGroup="Gm.SelectedGroup"
                             OnCurrentChannelChanged="ChangeCurrentChannel"
                             UserName=@Am.UserName
                             userId=@Am.UserId
-                            ChannelsMap="@Cm.ChannelsDictionary"
-                            IsOwned="@Gm.SelectedGroup.Value"/>
+                            ChannelsMap="@Cm.ChannelsDictionary"/>
                         <_RoomChat/>
                     </div>
                 </div>
@@ -61,7 +63,7 @@
     protected override async Task OnInitializedAsync()
     {
         await Am.InitAsync();
-        await Gm.InitAsync();
+        await Gm.Init();
         await Cm.InitAsync();
     }
     private void ChangeCurrentGroup(int gid)
@@ -72,6 +74,10 @@
     {
         Cm.SelectedChannelId = cid;
     }
+
+    /// <summary>
+    /// 定义 Mud 库的主题颜色
+    /// </summary>
     private readonly MudTheme MisteryTheme = new MudTheme()
     {
         Palette = new Palette()

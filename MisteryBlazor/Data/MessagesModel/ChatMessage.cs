@@ -2,6 +2,9 @@
 
 namespace MisteryBlazor.Data.MessagesModel
 {
+    /// <summary>
+    /// 私聊消息模型
+    /// </summary>
     public class ChatMessage
     {
         [Key]

@@ -3,6 +3,10 @@ using MisteryBlazor.Enums;
 
 namespace MisteryBlazor.Data.User
 {
+    /// <summary>
+    /// 用户关系模型，定义是谁发起的加好友申请、谁接收的加好友申请 <br/>
+    /// Status 为该关系状态
+    /// </summary>
     public class Relation
     {
         [Key]
