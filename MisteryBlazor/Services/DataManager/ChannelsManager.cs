@@ -102,13 +102,23 @@ namespace MisteryBlazor.Services.DataManager
                 throw;
             }
         }
-        public async Task UpdateCategoryName(string log, int cid, string uid, string newName)
+        /// <summary>
+        /// 更新类别 cid 的名称
+        /// </summary>
+        /// <param name="cid"></param>
+        /// <param name="uid"></param>
+        /// <param name="newName"></param>
+        /// <returns>Task</returns>
+        /// <exception cref="Exception"></exception>
+        public async Task UpdateCategoryName(int cid, string uid, string newName)
         {
+            var sb = new StringBuilder();
+            sb.Append("Category ").Append(cid).Append("updating name: ").Append(newName);
             if (newName.ToASCIIByte().Length >= StringMarco.MAX_STRING_LENGTH || newName.Length == 0) 
                 throw new Exception("Group name out of bounds");
             try
             {
-                await _Gps.UpdateCategoryName(log, cid, uid, newName);
+                await _Gps.UpdateCategoryNameAsync(sb.ToString(), cid, uid, newName);
             }
             catch (Exception e)
             {

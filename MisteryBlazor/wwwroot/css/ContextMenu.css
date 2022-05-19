@@ -22,17 +22,23 @@
     transition: transform 300ms ease-out, opacity 100ms ease-out;
 }
 .mistery-contextmenu-item {
-    padding: 8px 8px 5px 8px;
-    font-size: 15px;
+    padding: 5px;
+    font-size: 14px;
+    justify-items: center;
     color: #CCCCCC;
+    border-radius: 5px;
 }
-
-.mistery-contextmenu .mistery-contextmenu-item:hover {
-    mix-blend-mode: difference;
+.mistery-contextmenu-item:active {
+    transform: translateY(2px);
 }
 
 .mistery-contextmenu-item-hr {
     margin: 0px;
-    margin-top: 5px;
+    margin: 5px;
     border-color: #555555;
+}
+
+.mistery-contextmenu-item:hover {
+    background-color: #3A3A3A;
+    transition: background-color 250ms;
 }

@@ -3,7 +3,7 @@
 
 <div style="background-color: @MenuColor !important;"
      id="@Id"
-     Class="@Class">
+     Class="@Class unable-to-select">
     @{
         if (Items is not null)
         {
@@ -13,16 +13,16 @@
             {
                 if (i.ItemName.Equals(Marcos.StringMarco.CONTEXT_MENU_DIVIDER))
                 {
-                    <hr Style="color: @HrColor !important;" class="@HrClass"/>
+                       <hr Style="color: @HrColor !important;" class="@HrClass"/>
                 }
                 else
                 {
-                    <div class="@ItemBoxClass unable-to-select"
-                         id="@sb.Append(ItemId).Append("-").Append(i.ItemName).ToString()"
-                         onclick="@i.ItemAction"
-                         Style="color: @ItemTextColor !important;">
-                        @i.ItemName
-                    </div>
+                      <div class="@ItemBoxClass"
+                           id="@sb.Append(ItemId).Append("-").Append(i.ItemName).ToString()"
+                           onclick="@i.ItemAction"
+                           Style="color: @ItemTextColor !important;">
+                          @i.ItemName
+                      </div>
                 }
             }
         }

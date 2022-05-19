@@ -2,6 +2,18 @@
     document.getElementById(id).className = className;
 }
 
+function AddClass(id, className) {
+    document.getElementById(id).classList.add(className);
+}
+
+function RemoveClass(id, className) {
+    document.getElementById(id).classList.remove(className);
+}
+
+function ChangeStyle(id, style) {
+    document.getElementById(id).style.cssText = style;
+}
+
 function EnableContextMenu(menuId, handler, activeClass, inactiveClass) {
     const handleElement = document.getElementById(handler);
     handleElement.classList.add("m-context-menu");

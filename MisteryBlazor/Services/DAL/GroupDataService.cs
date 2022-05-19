@@ -278,7 +278,7 @@ namespace MisteryBlazor.Services.DAL
             await _context.SaveChangesAsync();
         }
         /// <summary>
-        /// 判断 gid 组的所有者是不是 uid
+        /// 判断用户是否为某群群主
         /// </summary>
         /// <param name="log"></param>
         /// <param name="gid"></param>
@@ -308,11 +308,22 @@ namespace MisteryBlazor.Services.DAL
             _logger.LogInformation(string.Empty, log);
             return Channels;
         }
+        /// <summary>
+        /// 获取整个 ChannelCategories 表
+        /// </summary>
+        /// <param name="log"></param>
+        /// <returns>ChannelCategory List</returns>
         public List<ChannelCategory> GetAllChannelCategories(string log)
         {
             _logger.LogInformation(string.Empty, log);
             return ChannelCategorys.ToList();
         }
+        /// <summary>
+        /// 根据群 gid 获取该群所有频道
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="gid"></param>
+        /// <returns>Channel List</returns>
         public List<Channel>? GetChannelFromGroup(string log, int gid)
         {
             try
@@ -327,6 +338,12 @@ namespace MisteryBlazor.Services.DAL
                 return new List<Channel>();
             }
         }
+        /// <summary>
+        /// 异步地根据群 gid 获取该群所有频道
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="gid"></param>
+        /// <returns>Channel List</returns>
         public async Task<List<Channel>>? GetChannelFromGroupAsync(string log, int gid)
         {
             try
@@ -341,7 +358,12 @@ namespace MisteryBlazor.Services.DAL
                 return new List<Channel>();
             }
         }
-
+        /// <summary>
+        /// 根据 cid 获取对应的频道模型
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="cid"></param>
+        /// <returns>Channel</returns>
         public Channel GetChannelById(string log, int cid)
         {
             _logger.LogInformation(string.Empty, log);
@@ -352,6 +374,12 @@ namespace MisteryBlazor.Services.DAL
             _logger.LogInformation(string.Empty, log);
             return Channels.Find(c => c.Id == cid);
         }
+        /// <summary>
+        /// 异步地根据群 gid 获取所有群类别
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="gid"></param>
+        /// <returns>ChannelCategory List</returns>
         public async Task<List<ChannelCategory>>? GetChannelCatagoryFromGroupAsync(string log, int gid)
         {
             try
@@ -366,7 +394,12 @@ namespace MisteryBlazor.Services.DAL
                 return new List<ChannelCategory>();
             }
         }
-
+        /// <summary>
+        /// 异步地根据群 gid 获取频道类别以及类别内所有群
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="gid"></param>
+        /// <returns>ChannelCategory, Channel IList</returns>
         public async Task<Dictionary<ChannelCategory, IList<Channel>>> GetChannelWithCatagoryFromGroupAsync(string log,
             int gid)
         {
@@ -399,6 +432,15 @@ namespace MisteryBlazor.Services.DAL
                 return new();
             }
         }
+        /// <summary>
+        /// 创建类别，并返回创建好的类别实体
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="uid"></param>
+        /// <param name="gid"></param>
+        /// <param name="name"></param>
+        /// <returns>ChannelCategory EntityEntry</returns>
+        /// <exception cref="Exception"></exception>
         public EntityEntry<ChannelCategory> CreateCategory(string log, string uid, int gid, string name)
         {
             _logger.LogInformation(string.Empty, log);
@@ -415,6 +457,14 @@ namespace MisteryBlazor.Services.DAL
             ChannelCategorys = _context.ChannelCategories.ToHashSet();
             return result;
         }
+        /// <summary>
+        /// 异步地伪删除类别
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="cid"></param>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task SetCategoryDeletedAsync(string log, int cid, string uid)
         {
             if (!GroupMemberVerification("UpdatingName: Verification working.", cid, uid))
@@ -429,6 +479,16 @@ namespace MisteryBlazor.Services.DAL
             }
             _logger.LogInformation(string.Empty, log);
         }
+        /// <summary>
+        /// 创建频道，并返回已创建好的频道实体
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="uid"></param>
+        /// <param name="gid"></param>
+        /// <param name="cid"></param>
+        /// <param name="name"></param>
+        /// <returns>Channel EntityEntry</returns>
+        /// <exception cref="Exception"></exception>
         public EntityEntry<Channel> CreateChannel(string log, string uid, int gid, int cid, string name)
         {
             _logger.LogInformation(string.Empty, log);
@@ -446,6 +506,14 @@ namespace MisteryBlazor.Services.DAL
             ChannelCategorys = _context.ChannelCategories.ToHashSet();
             return result;
         }
+        /// <summary>
+        /// 异步地伪删除频道
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="cid"></param>
+        /// <param name="uid"></param>
+        /// <returns>Task</returns>
+        /// <exception cref="Exception"></exception>
         public async Task SetChannelDeletedAsync(string log, int cid, string uid)
         {
             if (!GroupMemberVerification("UpdatingName: Verification working.", cid, uid))
@@ -460,7 +528,16 @@ namespace MisteryBlazor.Services.DAL
             }
             _logger.LogInformation(string.Empty, log);
         }
-        public async Task UpdateCategoryName(string log, int cid, string uid, string newName)
+        /// <summary>
+        /// 异步地更新类别名称
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="cid"></param>
+        /// <param name="uid"></param>
+        /// <param name="newName"></param>
+        /// <returns>Task</returns>
+        /// <exception cref="Exception"></exception>
+        public async Task UpdateCategoryNameAsync(string log, int cid, string uid, string newName)
         {
             if (newName.ToASCIIByte().Length >= StringMarco.MAX_STRING_LENGTH || newName.Length == 0) throw new Exception("Group name.length >=StringMarcos.MAX_STRING_LENGTH");
             if (!GroupMemberVerification("UpdatingName: Verification working.", cid, uid)) return;
@@ -470,7 +547,16 @@ namespace MisteryBlazor.Services.DAL
             Channels = _context.Channels.ToList();
             ChannelCategorys = _context.ChannelCategories.ToHashSet();
         }
-        public async Task UpdateChannelName(string log, int cid, string uid, string newName)
+        /// <summary>
+        /// 异步地更新频道抿成
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="cid"></param>
+        /// <param name="uid"></param>
+        /// <param name="newName"></param>
+        /// <returns>Task</returns>
+        /// <exception cref="Exception"></exception>
+        public async Task UpdateChannelNameAsync(string log, int cid, string uid, string newName)
         {
             if (newName.ToASCIIByte().Length >= StringMarco.MAX_STRING_LENGTH || newName.Length == 0) throw new Exception("Group name.length >=StringMarcos.MAX_STRING_LENGTH");
             if (!GroupMemberVerification("UpdatingName: Verification working.", cid, uid)) return;
@@ -480,6 +566,13 @@ namespace MisteryBlazor.Services.DAL
             Channels = _context.Channels.ToList();
             ChannelCategorys = _context.ChannelCategories.ToHashSet();
         }
+        /// <summary>
+        /// 群成员操作权限验证
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="gid"></param>
+        /// <param name="uid"></param>
+        /// <returns>bool</returns>
         public bool GroupMemberVerification(string log, int gid, string uid)
         {
             return IsUserOwnedGroup(log, gid, uid);

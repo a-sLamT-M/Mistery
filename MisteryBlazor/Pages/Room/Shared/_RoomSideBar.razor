@@ -19,12 +19,13 @@
 @inject GroupManagerEvents Gme;
 @inject ChannelManagerEvents Cme;
 @inject ISnackbar Snackbar;
+
 <div id="room-sidebar-main" class="room-sidebar">
     <div class="room-sidebar-main-container mud-theme-primary mud-elevation-2">
         <div class="room-sidebar-body">
             @if (CurrentGroup.Key is not null && !CurrentGroup.Key.IsDeleted)
             {
-                <div class="room-sidebar-top mud-theme-primary unable-to-select">
+                <div class="room-sidebar-top mud-theme-primary unable-to-select mud-elevation-1">
                     <div class="room-sidebar-textgroup">
                         <div class="fs-4 fw-bold room-sidebar-top-text">@CurrentGroup.Key.GroupName.ToStringFromASCIIByte()</div>
                         <div class="fs-7 room-sidebar-top-text-id"># @CurrentGroup.Key.Id</div>
@@ -58,11 +59,14 @@
                         {
                             <_RoomSidebarChannel
                                 color="Color.Dark"
-                                ChannelsMap="new KeyValuePair<ChannelCategory, IList<Channel>>(c.Key, c.Value)"
+                                CurrentCategory="c.Key"
+                                CurrentChannels="c.Value"
                                 IsOwned="@CurrentGroup.Value"
                                 OnClick="id => ChannelCompOnClick(id)"
-                                HandleChannelCreate="current => { D_Para.CurrentCategory = current; D_Para.CreateChannelDialogVisible = true; }"
-                                HandleCategoryDelete="current => { D_Para.CurrentCategory = current; D_Para.IsDeleteCategoryDialogVisible = true; }"/>
+                                HandleChannelCreate="() => { D_Para.CurrentCategory = c.Key; D_Para.CreateChannelDialogVisible = true; }"
+                                HandleChannelDelete="() => { return; }"
+                                HandleCategoryDelete="() => { D_Para.CurrentCategory = c.Key; D_Para.IsDeleteCategoryDialogVisible = true; }"
+                                HandleCategoryRename="name=>RenameCategory(userId,c.Key.Id,name)"/>
                         }
                     }
                 </div>
@@ -129,13 +133,13 @@
 <CreateCategoryDialog
     Visible="@D_Para.CreateCategoryVisible"
     HandleCancel="@D_Para.HandleCancel"
-    HandleOk="async name => await DoCreateCategory(name)"
+    HandleOk="async name => await CreateCategory(name)"
 />
 
 <CreateChannelDialog
     Visible="@D_Para.CreateChannelDialogVisible"
     HandleCancel="@D_Para.HandleCancel"
-    HandleOk="async name => await DoCreateChannel(name)"
+    HandleOk="async name => await CreateChannel(name)"
 />
 
 <DeleteCategory
@@ -220,7 +224,7 @@
     [ParameterAttribute]
     public EventCallback<int> OnCurrentChannelChanged { get; set; }
 
-    private async Task DoCreateCategory(string name)
+    private async Task CreateCategory(string name)
     {
         try
         {
@@ -233,7 +237,7 @@
         }
         D_Para.HandleCancel();
     }
-    private async Task DoCreateChannel(string name)
+    private async Task CreateChannel(string name)
     {
         try
         {
@@ -274,6 +278,18 @@
         else if(CurrentChannelId != LastChannelId)
             CurrentChannelId = id;
         await OnCurrentChannelChanged.InvokeAsync(id);
+    }
+    private async Task RenameCategory(string uid, int cid, string name)
+    {
+        try
+        {
+            await Cm.UpdateCategoryName(cid, uid, name);
+            Snackbar.Add("成功命名该类别", Severity.Success);
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add("无法命名该类别", Severity.Error);
+        }
     }
     protected override async Task OnInitializedAsync()
     {

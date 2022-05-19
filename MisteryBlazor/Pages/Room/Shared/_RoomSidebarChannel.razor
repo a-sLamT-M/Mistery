@@ -1,57 +1,114 @@
 ﻿@using MisteryBlazor.Data.GroupsModel
+@using MisteryBlazor.Pages.Room.Dialog.ChannelDialog
 @using MisteryBlazor.StringUtils
 @using Color = AntDesign.Color
 @using System.Text
 @using MisteryBlazor.Pages.ContextMenu
+@inject IJSRuntime Js;
+
 @{
     StringBuilder sb = new();
-    sb.Append("room-sidebar-category-").Append(ChannelsMap.Key.Id.ToString());
-
-    <div id="@sb.ToString()" class="unable-to-select">
-        <MudPaper Width="251px" Elevation="0" >
-            <MudTreeView Color="@color" @bind-SelectedValue="SelectedValue" T="string" id="@sb.ToString()">
-                <MudTreeViewItem Value="@ChannelsMap.Key.CategoryName.ToStringFromASCIIByte()" Icon="@Icons.Filled.Label">
-                @foreach (var ch in ChannelsMap.Value)
-                        {
-                            sb.Clear();
-                            sb.Append("room-sidebar-").Append(ch.Id);
-                            <div id="@sb.ToString()">
-                                <MudTreeViewItem Value="@ch.ChannelName.ToStringFromASCIIByte()" Icon="@Icons.Filled.Group" OnClick="()=>OnClick.InvokeAsync(ch.Id)"/>
-                            </div>
-                                HashSet<MisteryMenuItem> ChannelMenu = new();
-                                if (IsOwned || HasRenamePermission)
-                                {
-                                    ChannelMenu.Add(new MisteryMenuItem("重命名"));
-                                }
-                                if (IsOwned || HasCategoryDeletePermission)
-                                {
-                                    ChannelMenu.Add(new MisteryMenuItem("删除频道", arg => HandleCategoryDelete.InvokeAsync(ChannelsMap.Key)));
-                                }
-                                ChannelMenu.Add(MisteryMenuItem.Divider());
-                                ChannelMenu.Add(new MisteryMenuItem("属性"));
-                                <MisteryContextMenu Id="room-sidebar-channelmenu" Items="@ChannelMenu" TargetId="@sb.ToString()"/>
-                        }
-                </MudTreeViewItem>
-            </MudTreeView>
-        </MudPaper>
+    sb.Append("room-sidebar-category-").Append(CurrentCategory.Id.ToString());
+    <div class="room-sidebar-category-channel-container">
+        @{
+            string name = string.Empty;
+            if (CurrentCategory.CategoryName.ToStringFromASCIIByte().Length >= 20)
+            {
+                name = CurrentCategory.CategoryName.ToStringFromASCIIByte();
+                name = name[..20] + "...";
+            }
+            else
+            {
+                name = CurrentCategory.CategoryName.ToStringFromASCIIByte();
+            }
+        }
+        @if (Expanded)
+        {
+            <div class="mouse-pointer room-sidebar-channel-category unable-to-select" id="@sb.ToString()" onclick="@ActiveCategoryList">
+                <div class="room-sidebar-channel-arrow room-sidebar-channel-arrow-active" id="icon-arrow">
+                    <MudIcon Icon="@Icons.Filled.ArrowForwardIos" Style="height: 8px; width: 8px;"></MudIcon>
+                </div>
+                <div class="room-sidebar-category-name">
+                    @name
+                </div>
+                <div class="room-sidebar-channel-category-addicon"></div>
+                <MudIcon Icon="@Icons.Filled.Add" Style="height: 20px; width: 20px;"></MudIcon>
+            </div>
+            StringBuilder nsb = new();
+            @foreach (var ch in CurrentChannels)
+            {
+                sb.Clear();
+                sb.Append("room-sidebar-").Append(ch.Id);
+                nsb.Append("room-sidebar-channelmenu-").Append(ch.Id);
+                string sid = "room-sidebar-single-channel-settings-" + ch.Id.ToString();
+                <div id="@sb.ToString()" class="room-sidebar-single-channel mouse-pointer unable-to-select"
+                     @onclick="() => OnClick.InvokeAsync(ch.Id)"
+                     @onmouseover="arg => HoverChannel(sid)"
+                     @onmouseout="arg => HoverChannel(sid)">
+                    <div class="room-sidebar-category-single-channel-peopleico">
+                         <MudIcon Icon="@Icons.Filled.People" Style="height: 15px; width: 15px;"></MudIcon>
+                    </div>
+                    <div class="room-sidebar-single-channel-text">
+                        @ch.ChannelName.ToStringFromASCIIByte()
+                    </div>
+                    <div id="@sid" style="transform: scale(0);">
+                        <MudIcon Icon="@Icons.Filled.Settings" Style="height: 15px; width: 15px;"></MudIcon>
+                    </div>
+                </div>
+                HashSet<MisteryMenuItem> ChannelMenu = new();
+                if (IsOwned || HasRenamePermission)
+                {
+                    ChannelMenu.Add(new MisteryMenuItem("重命名"));
+                }
+                if (IsOwned || HasCategoryDeletePermission)
+                {
+                    ChannelMenu.Add(new MisteryMenuItem("删除频道", arg => HandleChannelDelete.InvokeAsync(CurrentCategory)));
+                }
+                ChannelMenu.Add(MisteryMenuItem.Divider());
+                ChannelMenu.Add(new MisteryMenuItem("属性"));
+                <MisteryContextMenu Id="@nsb.ToString()" Items="@ChannelMenu" TargetId="@sb.ToString()"/>
+                nsb.Clear();
+            }
+        }
+        else
+        {
+            <div class="mouse-pointer   room-sidebar-channel-category mouse-pointer unable-to-select" id="@sb.ToString()" onclick="@ActiveCategoryList">
+                <div class="room-sidebar-channel-arrow" id="arrow">
+                    <MudIcon Icon="@Icons.Filled.ArrowForwardIos" Style="height: 8px; width: 8px;"></MudIcon>
+                </div>
+                <div class="room-sidebar-category-name">
+                    @name
+                </div>
+                <div class="room-sidebar-channel-category-addicon"></div>
+                <MudIcon Icon="@Icons.Filled.Add" Style="height: 20px; width: 20px;"></MudIcon>
+            </div>
+        }
     </div>
 }
 
+
+<RenameCategoryDialog
+    Visible="@D_Para.IsRenameCategoryDialogVisible" 
+    HandleCancel="@D_Para.HandleCancel"
+    HandleOk="async name => {await HandleCategoryRename.InvokeAsync(name); D_Para.IsRenameCategoryDialogVisible=false;}"
+    Name="@CurrentCategory.CategoryName.ToStringFromASCIIByte()"
+/>
+
 @{
     sb.Clear();
-    sb.Append("room-sidebar-category-").Append(ChannelsMap.Key.Id.ToString());
+    sb.Append("room-sidebar-category-").Append(CurrentCategory.Id.ToString());
     HashSet<MisteryMenuItem> CategoryMenu = new();
-    @if (IsOwned || HasRenamePermission)
+    if (IsOwned || HasRenamePermission)
     {
-        CategoryMenu.Add(new MisteryMenuItem("重命名"));
+        CategoryMenu.Add(new MisteryMenuItem("重命名", arg=> { D_Para.IsRenameCategoryDialogVisible = true; }));
     }
-    @if (IsOwned || HasChannelCreatePermission)
+    if (IsOwned || HasChannelCreatePermission)
     {
-        CategoryMenu.Add(new MisteryMenuItem("创建频道", arg => HandleChannelCreate.InvokeAsync(ChannelsMap.Key)));
+        CategoryMenu.Add(new MisteryMenuItem("创建频道", arg => HandleChannelCreate.InvokeAsync()));
     }
-    @if (IsOwned || HasCategoryDeletePermission)
+    if (IsOwned || HasCategoryDeletePermission)
     {
-        CategoryMenu.Add(new MisteryMenuItem("删除类别", arg => HandleCategoryDelete.InvokeAsync(ChannelsMap.Key)));
+        CategoryMenu.Add(new MisteryMenuItem("删除类别", arg => HandleCategoryDelete.InvokeAsync()));
     }
     CategoryMenu.Add(MisteryMenuItem.Divider());
     CategoryMenu.Add(new MisteryMenuItem("属性"));
@@ -59,21 +116,38 @@
 }
 
 @code {
+    class DialogPara
+    {
+        public bool IsRenameCategoryDialogVisible { get; set; } = false;
+
+        public void HandleCancel()
+        {
+            IsRenameCategoryDialogVisible = false;
+        }
+    }
+
+    DialogPara D_Para = new();
+
+    public bool Expanded = false;
+    public bool IsMouseOverChannel = false;
+
     [ParameterAttribute]
     public MudBlazor.Color color { get; set; }
+    [Parameter]
+    public ChannelCategory CurrentCategory { get; set; }
+    [Parameter]
+    public IList<Channel> CurrentChannels { get; set; }
 
     [ParameterAttribute]
-    public KeyValuePair<ChannelCategory, IList<Channel>> ChannelsMap { get; set; } = new();
-
+    public EventCallback HandleCategoryDelete { get; set; }
     [ParameterAttribute]
-    public EventCallback<ChannelCategory> HandleCategoryDelete { get; set; }
+    public EventCallback<string> HandleCategoryRename { get; set; }
     [ParameterAttribute]
-    public EventCallback HandleCategoryRename { get; set; }
-    [ParameterAttribute]
-    public EventCallback<ChannelCategory> HandleChannelCreate { get; set; }
+    public EventCallback HandleChannelCreate { get; set; }
+    [Parameter]
+    public EventCallback  HandleChannelDelete { get; set; }
     [ParameterAttribute]
     public EventCallback<int> OnClick { get; set; }
-
     [ParameterAttribute]
     public bool IsOwned { get; set; } = false;
     [ParameterAttribute]
@@ -82,9 +156,27 @@
     public bool HasCategoryDeletePermission { get; set; } = false;
     [ParameterAttribute]
     public bool HasChannelCreatePermission { get; set; } = false;
-
     [ParameterAttribute]
     public string SelectedValue { get; set; } = string.Empty;
+
+    public void ActiveCategoryList()
+    {
+        Js.InvokeVoidAsync(Expanded ? "RemoveClass" : "AddClass", "icon-arrow", "room-sidebar-channel-arrow-active");
+        Expanded = !Expanded;
+    }
+
+    public void HoverChannel(string id)
+    {
+        IsMouseOverChannel = !IsMouseOverChannel;
+        if (IsMouseOverChannel)
+        {
+            Js.InvokeVoidAsync("ChannelHover", id);
+        }
+        else
+        {
+            Js.InvokeVoidAsync("ChannelOut", id);
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {

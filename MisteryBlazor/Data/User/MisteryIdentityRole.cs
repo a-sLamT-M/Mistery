@@ -12,7 +12,6 @@ namespace MisteryBlazor.Data.User
         {
             Id = str.GetIntId().ToString();
         }
-
         public MisteryIdentityRole(string roleName) : this()
         {
             Name = roleName;

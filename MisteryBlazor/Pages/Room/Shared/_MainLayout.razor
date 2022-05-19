@@ -63,7 +63,7 @@
     protected override async Task OnInitializedAsync()
     {
         await Am.InitAsync();
-        await Gm.Init();
+        Gm.Init();
         await Cm.InitAsync();
     }
     private void ChangeCurrentGroup(int gid)

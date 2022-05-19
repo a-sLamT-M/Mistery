@@ -264,13 +264,17 @@ namespace MisteryBlazor.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("AvatarStamp")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<byte[]>("CreationTime")
                         .IsConcurrencyToken()
                         .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
-                    b.Property<int>("groupId")
+                    b.Property<int>("GroupId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -291,9 +295,6 @@ namespace MisteryBlazor.Migrations
                         .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
-
-                    b.Property<int>("CustomPermissionRoleId")
-                        .HasColumnType("int");
 
                     b.Property<int>("GroupId")
                         .HasColumnType("int");

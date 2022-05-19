@@ -46,7 +46,7 @@
     HashSet<MisteryMenuItem> items = new();
     if (HasRenamePermission || IsOwned)
     {
-        items.Add(new MisteryMenuItem("修改名称", args => D_Para.IsRenameGroupDialogVisible = true));
+        items.Add(new MisteryMenuItem("重命名", args => { D_Para.IsRenameGroupDialogVisible = true; }));
     }
 
     if (HasInvitePermission || IsOwned)
