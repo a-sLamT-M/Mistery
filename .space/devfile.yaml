@@ -6,4 +6,4 @@ attributes:
       # RubyMine, CLion, Fleet, GoLand, PhpStorm, Rider
       type: Rider
       version: '2022.1.1'
-      projectRoot: mistery-blazor/MisteryBlazor.sln
+    projectRoot: mistery-blazor/MisteryBlazor.sln
