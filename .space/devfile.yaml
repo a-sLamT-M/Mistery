@@ -7,4 +7,4 @@ attributes:
       type: Rider
       version: '2022.1.1'
       updateChannel: Release
-      projectRoot: mistery-blazor/MisteryBlazor.sln
+      projectRoot: Mistery/mistery-blazor/MisteryBlazor.sln
